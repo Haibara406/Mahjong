@@ -2,6 +2,14 @@
 
 A 1:1 recreation of [themahjong.guide](https://themahjong.guide/) - an interactive visual guide for learning mahjong.
 
+> Original Author: Emily Han
+>
+> X Link：https://x.com/emilyhanyf/status/2046784757384818960
+>
+> The repository is only used for my personal learning.
+>
+> If Emily Han believes that the repository contains copyright infringement, please contact me immediately through issue or email haibara406@gmail.com to close the repository.
+
 ## Features
 
 - **Interactive Tile Display**: Browse mahjong tiles with hover/tap details
