@@ -2585,7 +2585,8 @@ function Hero({ theme, setTheme2, setVariant, lang, setLang }) {
         ) : (
           <h1>
             Learn <em>mahjong</em><br/>
-            A visual <em>guide</em><span className="mj-zh">麻將</span>
+            A visual <em>guide</em><br/>
+            <span className="mj-zh">麻將</span>
           </h1>
         )}
         <div className="mj-hero-meta">
