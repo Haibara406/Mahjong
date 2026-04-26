@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import * as ReactDOM from 'react-dom'
 
 // Tile data + Tile component. Uses /tiles/*.svg.
 // Mahjong has 34 unique tiles × 4 copies = 136 + 8 bonus flowers/seasons.
@@ -75,6 +74,14 @@ const FLOWER_META = {
 };
 
 const BLOG_URL = 'https://haerin.haikari.top/about';
+
+const RULESETS = [
+  { id: 'hk', shortLabel: 'Hong Kong', label: 'Hong Kong rules · 香港麻將' },
+  { id: 'taiwan', shortLabel: 'Taiwan', label: 'Taiwan rules · 台灣麻將' },
+  { id: 'sichuan', shortLabel: 'Sichuan', label: 'Sichuan rules · 四川麻将' },
+];
+
+const SUITED_GROUPS = ['wan', 'tiao', 'bing'];
 
 const SUIT_META = {
   wan: { label: 'Characters', sub: '萬 · Wàn', desc: 'Numbered 1–9. The character 萬 means "ten thousand."' },
@@ -201,10 +208,8 @@ function SectionTiles() {
   const [selected, setSelected] = React.useState(null);
   const [suit, setSuit] = React.useState('all');
   const [isTouch, setIsTouch] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
     setIsTouch(window.matchMedia('(hover: none) and (pointer: coarse)').matches);
   }, []);
 
@@ -213,8 +218,9 @@ function SectionTiles() {
     setSelected(null);
   }, [variant]);
 
+  const tileGroups = variant === 'sichuan' ? SUITED_GROUPS : Object.keys(TILES);
   const allTiles = [];
-  const groups = suit === 'all' ? Object.keys(TILES) : [suit];
+  const groups = suit === 'all' ? tileGroups : [suit];
   for (const g of groups) {
     if (!TILES[g]) continue;
     for (const t of TILES[g]) allTiles.push({ ...t, suit: g });
@@ -231,15 +237,22 @@ function SectionTiles() {
       || Object.values(TILES).flat().find(t => t.id === activeId)
     : null;
 
-  const suits = [
-    { id: 'all', label: 'All 34', count: 34 },
-    { id: 'wan', label: 'Characters', count: 9 },
-    { id: 'tiao', label: 'Bamboo', count: 9 },
-    { id: 'bing', label: 'Dots', count: 9 },
-    { id: 'wind', label: 'Winds', count: 4 },
-    { id: 'dragon', label: 'Dragons', count: 3 },
-    ...(variant === 'taiwan' ? [{ id: 'flower', label: 'Bonus', count: 8 }] : []),
-  ];
+  const suits = variant === 'sichuan'
+    ? [
+      { id: 'all', label: 'All 27', count: 27 },
+      { id: 'wan', label: 'Characters', count: 9 },
+      { id: 'tiao', label: 'Bamboo', count: 9 },
+      { id: 'bing', label: 'Dots', count: 9 },
+    ]
+    : [
+      { id: 'all', label: 'All 34', count: 34 },
+      { id: 'wan', label: 'Characters', count: 9 },
+      { id: 'tiao', label: 'Bamboo', count: 9 },
+      { id: 'bing', label: 'Dots', count: 9 },
+      { id: 'wind', label: 'Winds', count: 4 },
+      { id: 'dragon', label: 'Dragons', count: 3 },
+      ...(variant === 'taiwan' ? [{ id: 'flower', label: 'Bonus', count: 8 }] : []),
+    ];
 
   return (
     <section id="section-tiles" className="mj-section" data-screen-label="01 Tiles">
@@ -249,6 +262,8 @@ function SectionTiles() {
         <p className="mj-lede">
           {variant === 'taiwan' ? (
             <>A mahjong set in Taiwan rules has <strong>144 tiles</strong>: the same 34 unique designs × 4, plus <strong>8 bonus tiles</strong> — four Flowers and four Seasons. These are never part of a winning hand; they score separately.</>
+          ) : variant === 'sichuan' ? (
+            <>Sichuan mahjong uses a lean <strong>108-tile</strong> set: only the three numbered suits, 1–9, four of each. Winds, dragons, flowers, and seasons are removed, so every tile you see here can enter the hand.</>
           ) : (
             <>A mahjong set has <strong>136 tiles</strong>: 34 unique designs, four of each. Three suits run 1–9 (Characters, Bamboo, Dots), plus the honor tiles — four Winds and three Dragons.</>
           )}
@@ -362,40 +377,39 @@ function SectionTiles() {
               <div className="mj-info-empty">
                 <div className="mj-info-empty-h">Hover or tap a tile</div>
                 <div className="mj-info-empty-p">
-                  Each appears four times in the wall. The numbered suits behave like three independent decks; the honors can't form runs.
+                  {variant === 'sichuan'
+                    ? 'Each tile appears four times. Sichuan keeps only the three numbered suits, which makes suit management and the missing-suit rule matter immediately.'
+                    : "Each appears four times in the wall. The numbered suits behave like three independent decks; the honors can't form runs."}
                 </div>
               </div>
             )}
           </aside>
         </div>
 
-        {mounted && ReactDOM.createPortal(
-          <div
-            className={`mj-tile-popup ${selected ? 'is-active' : ''}`}
-            onClick={() => setSelected(null)}
-          >
-            <div className="mj-tile-popup-sheet" onClick={e => e.stopPropagation()}>
-              <button className="mj-tile-popup-close" onClick={() => setSelected(null)}>✕</button>
-              {info && (
-                <>
-                  <div className="mj-info-big"><Tile id={info.id} size="xl" /></div>
-                  <div className="mj-info-zh">{info.zh}</div>
-                  <div className="mj-info-en">{info.en}</div>
-                  <div className="mj-info-meta">
-                    {info.suit === 'wan' && 'Suit · Characters (萬). Read the top symbol as the number, bottom as the suit.'}
-                    {info.suit === 'tiao' && 'Suit · Bamboo (條). The 1-bamboo shows a bird — a classical flourish.'}
-                    {info.suit === 'bing' && 'Suit · Dots (餅). Each circle is a stack of coins.'}
-                    {info.suit === 'wind' && 'Honor tile · one of four winds. Your seat wind and the round wind both matter for scoring.'}
-                    {info.suit === 'dragon' && 'Honor tile · one of three dragons. A pung of dragons is always worth points.'}
-                    {info.suit === 'flower' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
-                    {info.suit === 'season' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>,
-          document.body
-        )}
+        <div
+          className={`mj-tile-popup ${selected ? 'is-active' : ''}`}
+          onClick={() => setSelected(null)}
+        >
+          <div className="mj-tile-popup-sheet" onClick={e => e.stopPropagation()}>
+            <button className="mj-tile-popup-close" onClick={() => setSelected(null)}>✕</button>
+            {info && (
+              <>
+                <div className="mj-info-big"><Tile id={info.id} size="xl" /></div>
+                <div className="mj-info-zh">{info.zh}</div>
+                <div className="mj-info-en">{info.en}</div>
+                <div className="mj-info-meta">
+                  {info.suit === 'wan' && 'Suit · Characters (萬). Read the top symbol as the number, bottom as the suit.'}
+                  {info.suit === 'tiao' && 'Suit · Bamboo (條). The 1-bamboo shows a bird — a classical flourish.'}
+                  {info.suit === 'bing' && 'Suit · Dots (餅). Each circle is a stack of coins.'}
+                  {info.suit === 'wind' && 'Honor tile · one of four winds. Your seat wind and the round wind both matter for scoring.'}
+                  {info.suit === 'dragon' && 'Honor tile · one of three dragons. A pung of dragons is always worth points.'}
+                  {info.suit === 'flower' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
+                  {info.suit === 'season' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {variant === 'taiwan' && suit !== 'flower' && (
           <div className="mj-flower-section">
@@ -633,9 +647,86 @@ const WINNING_HANDS_TAIWAN = [
   },
 ];
 
+const WINNING_HANDS_SICHUAN = [
+  {
+    id: 'basic',
+    name: 'Standard missing-suit hand',
+    zh: '缺一門',
+    melds: [
+      { type: 'chow', tiles: ['wan-2', 'wan-3', 'wan-4'], label: 'Run · 2-3-4 Characters' },
+      { type: 'chow', tiles: ['wan-6', 'wan-7', 'wan-8'], label: 'Run · 6-7-8 Characters' },
+      { type: 'pung', tiles: ['bing-3', 'bing-3', 'bing-3'], label: 'Pung · 3 Dots' },
+      { type: 'chow', tiles: ['bing-7', 'bing-8', 'bing-9'], label: 'Run · 7-8-9 Dots' },
+      { type: 'pair', tiles: ['wan-5', 'wan-5'], label: 'Pair · 5 Characters' },
+    ],
+    points: 'base',
+    desc: 'Four sets + one pair, with one suit missing. This example has no Bamboo tiles, so it satisfies 缺一門 after choosing Bamboo as the missing suit.',
+  },
+  {
+    id: 'allpungs',
+    name: 'All Pungs',
+    zh: '碰碰胡',
+    melds: [
+      { type: 'pung', tiles: ['wan-3', 'wan-3', 'wan-3'], label: 'Pung · 3 Characters' },
+      { type: 'pung', tiles: ['wan-9', 'wan-9', 'wan-9'], label: 'Pung · 9 Characters' },
+      { type: 'pung', tiles: ['bing-2', 'bing-2', 'bing-2'], label: 'Pung · 2 Dots' },
+      { type: 'pung', tiles: ['bing-7', 'bing-7', 'bing-7'], label: 'Pung · 7 Dots' },
+      { type: 'pair', tiles: ['wan-5', 'wan-5'], label: 'Pair · 5 Characters' },
+    ],
+    points: '2+ fan',
+    desc: 'Every set is a triplet. Sichuan has no honor tiles, so this hand is built entirely from suited pungs.',
+  },
+  {
+    id: 'sevenpairs',
+    name: 'Seven Pairs',
+    zh: '七對',
+    melds: [
+      { type: 'pair', tiles: ['wan-1', 'wan-1'], label: 'Pair · 1 Characters' },
+      { type: 'pair', tiles: ['wan-4', 'wan-4'], label: 'Pair · 4 Characters' },
+      { type: 'pair', tiles: ['wan-8', 'wan-8'], label: 'Pair · 8 Characters' },
+      { type: 'pair', tiles: ['bing-2', 'bing-2'], label: 'Pair · 2 Dots' },
+      { type: 'pair', tiles: ['bing-5', 'bing-5'], label: 'Pair · 5 Dots' },
+      { type: 'pair', tiles: ['bing-7', 'bing-7'], label: 'Pair · 7 Dots' },
+      { type: 'pair', tiles: ['bing-9', 'bing-9'], label: 'Pair · 9 Dots' },
+    ],
+    points: '4+ fan',
+    desc: 'Seven pairs is a special 14-tile hand. It still must satisfy 缺一門; this example is missing Bamboo.',
+  },
+  {
+    id: 'purity',
+    name: 'Pure One Suit',
+    zh: '清一色',
+    melds: [
+      { type: 'chow', tiles: ['tiao-1', 'tiao-2', 'tiao-3'], label: 'Run · 1-2-3 Bamboo' },
+      { type: 'chow', tiles: ['tiao-3', 'tiao-4', 'tiao-5'], label: 'Run · 3-4-5 Bamboo' },
+      { type: 'pung', tiles: ['tiao-6', 'tiao-6', 'tiao-6'], label: 'Pung · 6 Bamboo' },
+      { type: 'chow', tiles: ['tiao-7', 'tiao-8', 'tiao-9'], label: 'Run · 7-8-9 Bamboo' },
+      { type: 'pair', tiles: ['tiao-5', 'tiao-5'], label: 'Pair · 5 Bamboo' },
+    ],
+    points: '4+ fan',
+    desc: 'Every tile comes from one suit. Since the other two suits are absent, it automatically satisfies the missing-suit requirement.',
+  },
+  {
+    id: 'longpairs',
+    name: 'Dragon Seven Pairs',
+    zh: '龍七對',
+    melds: [
+      { type: 'pair', tiles: ['wan-2', 'wan-2'], label: 'Pair · 2 Characters' },
+      { type: 'pair', tiles: ['wan-2', 'wan-2'], label: 'Extra pair · same tile' },
+      { type: 'pair', tiles: ['wan-5', 'wan-5'], label: 'Pair · 5 Characters' },
+      { type: 'pair', tiles: ['wan-8', 'wan-8'], label: 'Pair · 8 Characters' },
+      { type: 'pair', tiles: ['bing-1', 'bing-1'], label: 'Pair · 1 Dots' },
+      { type: 'pair', tiles: ['bing-4', 'bing-4'], label: 'Pair · 4 Dots' },
+      { type: 'pair', tiles: ['bing-9', 'bing-9'], label: 'Pair · 9 Dots' },
+    ],
+    points: 'higher',
+    desc: 'A Sichuan-style seven-pairs upgrade: one pair is actually all four copies of the same tile. Local tables score the exact fan differently.',
+  },
+];
+
 function SectionWin() {
   const variant = React.useContext(VariantContext);
-  const hands = variant === 'taiwan' ? WINNING_HANDS_TAIWAN : WINNING_HANDS;
+  const hands = variant === 'taiwan' ? WINNING_HANDS_TAIWAN : variant === 'sichuan' ? WINNING_HANDS_SICHUAN : WINNING_HANDS;
   const [handIdx, setHandIdx] = React.useState(0);
   const [stage, setStage] = React.useState(0);
   const [playing, setPlaying] = React.useState(false);
@@ -680,6 +771,8 @@ function SectionWin() {
         <p className="mj-lede">
           {variant === 'taiwan' ? (
             <>A winning hand is <strong>5 sets + 1 pair</strong> — 17 tiles total (you hold 16, draw 1 to win). A "set" is a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). You must reach at least <strong>1 臺</strong> to declare — a bare hand with no scoring combination is not allowed.</>
+          ) : variant === 'sichuan' ? (
+            <>A winning hand is usually <strong>4 sets + 1 pair</strong> — 14 tiles total, with special hands like Seven Pairs. The extra Sichuan test is <strong>缺一門</strong>: after choosing a missing suit, your winning hand must contain none of that suit.</>
           ) : (
             <>A winning hand is <strong>4 sets + 1 pair</strong> — 14 tiles total. A "set" is either a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). The pair is called the <em>eyes</em>.</>
           )}
@@ -687,6 +780,8 @@ function SectionWin() {
         <div className="mj-callout">
           {variant === 'taiwan' ? (
             <>You always hold <strong>16 tiles</strong>. You win the moment you draw or claim a 17th tile that completes your hand — so every standard winning hand is exactly 17 tiles. (Seven Pairs is a special exception at 14 tiles.)</>
+          ) : variant === 'sichuan' ? (
+            <>You always hold <strong>13 tiles</strong>. Sichuan tables commonly play 血戰到底: after the first player wins, the hand continues until three players have won or the wall runs out.</>
           ) : (
             <>You always hold <strong>13 tiles</strong>. You win the moment you draw or claim a 14th tile that completes your hand — so every winning hand is exactly 14 tiles total.</>
           )}
@@ -773,7 +868,7 @@ function SectionWin() {
             </div>
             <div className="mj-stage-arrow">→</div>
             <div className="mj-stage-formula">
-              {hand.id === 'sevenpairs' ? (
+              {hand.melds.every(m => m.type === 'pair') ? (
                 <span><strong>7</strong> pairs</span>
               ) : (
                 <span><strong>{hand.melds.filter(m => m.type !== 'pair').length}</strong> sets + <strong>1</strong> pair</span>
@@ -836,6 +931,31 @@ function SectionWin() {
               Self-draw (自摸): all three opponents pay you directly. On a discard win, only the discarder pays. Dealer pays or receives double.
             </div>
           </div>
+        ) : variant === 'sichuan' ? (
+          <div className="mj-scoring">
+            <div className="mj-scoring-h">Scoring bonuses · Sichuan</div>
+            <div className="mj-scoring-fan">
+              Sichuan tables still speak in <strong>fan</strong>, but exact values vary by house. The stable ideas: self-draw pays more, special hand shapes multiply, and kongs/roots add bonus value.
+            </div>
+            <div className="mj-scoring-grid">
+              {[
+                { name: 'Self-draw (自摸)', desc: 'You draw your own winning tile; usually all unfinished players pay', val: '+ fan', tiles: ['wan-5'] },
+                { name: 'All Pungs (碰碰胡)', desc: 'Four triplets plus a pair', val: '2+ fan', tiles: ['bing-7','bing-7','bing-7'] },
+                { name: 'Pure One Suit (清一色)', desc: 'All tiles from one suit', val: '4+ fan', tiles: ['tiao-3','tiao-4','tiao-5'] },
+                { name: 'Kong / Root (杠 / 根)', desc: 'Four copies of a tile, exposed or concealed, add bonus value', val: '+ bonus', tiles: ['wan-2','wan-2','wan-2','wan-2'] },
+              ].map((r, i) => (
+                <div key={i} className={`mj-score-row${r.limit ? ' mj-score-limit' : ''}`}>
+                  <div className="mj-score-name">{r.name}</div>
+                  <div className="mj-score-tiles">{r.tiles.map((t, ti) => <Tile key={ti} id={t} size="xs" />)}</div>
+                  <div className="mj-score-desc">{r.desc}</div>
+                  <div className="mj-score-val">{r.val}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mj-scoring-note">
+              The ruleset here models the common beginner-facing Sichuan pattern: 108 suited tiles, no chow claims, 定缺/缺一門, and 血戰到底 continuation.
+            </div>
+          </div>
         ) : (
           <div className="mj-scoring">
             <div className="mj-scoring-h">Scoring bonuses</div>
@@ -872,12 +992,17 @@ function SectionWin() {
 function SectionDraw() {
   const variant = React.useContext(VariantContext);
   const MAX_HAND = variant === 'taiwan' ? 17 : 14;
+  const isSichuan = variant === 'sichuan';
 
   const [hand, setHand] = React.useState([]);
   const [drawing, setDrawing] = React.useState(false);
   const [sorted, setSorted] = React.useState(false);
 
-  const DRAW_POOL = [
+  const DRAW_POOL = isSichuan ? [
+    'wan-3', 'bing-7', 'tiao-5', 'wan-8', 'bing-2', 'tiao-2',
+    'wan-5', 'bing-5', 'tiao-9', 'wan-1', 'bing-9', 'tiao-4',
+    'wan-6', 'bing-3', 'tiao-7', 'wan-9', 'bing-1', 'tiao-6',
+  ] : [
     'wan-3', 'bing-7', 'tiao-5', 'east', 'wan-8', 'bing-2',
     'tiao-2', 'red', 'wan-5', 'bing-5', 'south', 'tiao-9',
     'green', 'wan-1', 'bing-9', 'tiao-4', 'west', 'wan-6',
@@ -972,22 +1097,28 @@ function SectionDraw() {
   };
 
   const wallSides = ['top', 'right', 'bottom', 'left'];
+  const stackCountForSide = (side) => {
+    if (isSichuan) return { top: 14, right: 13, bottom: 14, left: 13 }[side];
+    return variant === 'taiwan' ? 18 : 17;
+  };
 
-  const SmallWall = ({ variant, showDirection, breakSeat: bSeat, breakIdx }) => (
-    <div className={`mj-wall-mini variant-${variant}`}>
+  const SmallWall = ({ step, showDirection, breakSeat: bSeat, breakIdx }) => (
+    <div className={`mj-wall-mini variant-${step}`}>
       <div className="mj-wall-inner">
         {wallSides.map((side) => {
           // Map side → seat for dynamic break highlighting
           const sideToSeat = { top: 'north', right: 'east', bottom: 'south', left: 'west' };
-          const isBreakSide = variant === 'break' && bSeat && sideToSeat[side] === bSeat;
+          const stackCount = stackCountForSide(side);
+          const breakPosition = Math.max(0, stackCount - 1 - Math.min(breakIdx || 0, stackCount - 1));
+          const isBreakSide = step === 'break' && bSeat && sideToSeat[side] === bSeat;
           return (
           <div key={side} className={`mj-wall-side mj-wall-${side} ${isBreakSide ? 'is-break-side' : ''}`}>
-            {Array.from({ length: 17 }).map((_, i) => {
+            {Array.from({ length: stackCount }).map((_, i) => {
               // For the break: count breakIdx stacks from the RIGHT end of the side.
-              // In the DOM each .mj-wall-side goes left→right; "right end" = last stack (i=16).
-              const isBroken = isBreakSide && i === 16 - breakIdx;
-              const isBreakDead = isBreakSide && i > 16 - breakIdx;
-              const isDealt = variant === 'deal' && side === 'top' && i >= 10;
+              // In the DOM each .mj-wall-side goes left→right; "right end" = last stack.
+              const isBroken = isBreakSide && i === breakPosition;
+              const isBreakDead = isBreakSide && i > breakPosition;
+              const isDealt = step === 'deal' && side === 'top' && i >= Math.max(0, stackCount - (isSichuan ? 5 : 7));
               return (
                 <div
                   key={i}
@@ -1001,7 +1132,7 @@ function SectionDraw() {
           </div>
           );
         })}
-        {variant === 'break' && showDirection !== false && (
+        {step === 'break' && showDirection !== false && (
           <>
             <div className="mj-dir-arrow mj-dir-arrow-top"><span className="mj-dir-arrow-label">北 N</span></div>
             <div className="mj-dir-arrow mj-dir-arrow-left"><span className="mj-dir-arrow-label">西 W</span></div>
@@ -1009,7 +1140,7 @@ function SectionDraw() {
             <div className="mj-dir-arrow mj-dir-arrow-right"><span className="mj-dir-arrow-label">東 E</span></div>
           </>
         )}
-        {showDirection && variant !== 'break' && (
+        {showDirection && step !== 'break' && (
           <>
             <div className="mj-dir-arrow mj-dir-arrow-top"><span className="mj-dir-arrow-label">北 N</span><span className="mj-dir-arrow-glyph">←</span></div>
             <div className="mj-dir-arrow mj-dir-arrow-left"><span className="mj-dir-arrow-glyph">↓</span><span className="mj-dir-arrow-label">西 W</span></div>
@@ -1029,7 +1160,13 @@ function SectionDraw() {
         <div className="mj-kicker">Section 03 · Opening the game</div>
         <h2 className="mj-h2">How do you draw tiles?</h2>
         <p className="mj-lede">
-          Before the first turn, the 136 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Here's the opening ritual — in four steps.
+          {variant === 'taiwan' ? (
+            <>Before the first turn, the 144 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Flowers and seasons are revealed and replaced whenever they appear.</>
+          ) : isSichuan ? (
+            <>Before the first turn, the 108 suited tiles become a shorter <strong>square wall</strong>. The opening feels familiar, but the wall is leaner because honors and bonus tiles are absent.</>
+          ) : (
+            <>Before the first turn, the 136 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Here's the opening ritual — in four steps.</>
+          )}
         </p>
       </div>
 
@@ -1044,6 +1181,8 @@ function SectionDraw() {
           <div className="mj-dealer-item-h">Dealer rotation</div>
           {variant === 'taiwan' ? (
             <p>Same as Hong Kong rules — the dealer keeps the East seat as long as they win. When any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong>. A drawn hand also keeps the dealer in place.</p>
+          ) : isSichuan ? (
+            <p>The dealer starts as East and play moves <strong>counter-clockwise</strong>. In 血戰到底 tables, the round can continue after a win, then the next hand rotates according to the table's dealer rule.</p>
           ) : (
             <p>The dealer keeps the East seat for as long as they keep winning. The moment any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong> — South becomes East, West becomes South, and so on. A drawn hand (荒莊) also keeps the dealer in place.</p>
           )}
@@ -1056,9 +1195,15 @@ function SectionDraw() {
           <div className="mj-draw-step-num">1</div>
           <div className="mj-draw-step-content">
             <div className="mj-draw-step-title">Build the wall</div>
-            <p>All 136 tiles are shuffled face-down and stacked two-high in a square. Each side is 17 stacks long — 17 × 2 × 4 = 136.</p>
+            {variant === 'taiwan' ? (
+              <p>All 144 tiles are shuffled face-down and stacked two-high in a square. Each side is 18 stacks long — 18 × 2 × 4 = 144.</p>
+            ) : isSichuan ? (
+              <p>All 108 suited tiles are shuffled face-down and stacked two-high. A common layout uses 54 stacks total — two sides with 14 stacks and two sides with 13.</p>
+            ) : (
+              <p>All 136 tiles are shuffled face-down and stacked two-high in a square. Each side is 17 stacks long — 17 × 2 × 4 = 136.</p>
+            )}
           </div>
-          <SmallWall variant="build" />
+          <SmallWall step="build" />
         </div>
 
         <div className="mj-draw-step">
@@ -1095,7 +1240,7 @@ function SectionDraw() {
               </div>
             </div>
           </div>
-          <SmallWall variant="break" breakSeat={breakSeat} breakIdx={breakStackFromRight} />
+          <SmallWall step="break" breakSeat={breakSeat} breakIdx={breakStackFromRight} />
         </div>
 
         <div className="mj-draw-step">
@@ -1106,11 +1251,13 @@ function SectionDraw() {
             </div>
             {variant === 'taiwan' ? (
               <p>Four tiles at a time until everyone has 16. The dealer draws first to hold 17. Any <strong>flower or season tile</strong> drawn during the deal is immediately revealed, set aside, and replaced from the dead wall — this can chain if the replacement is also a bonus tile.</p>
+            ) : isSichuan ? (
+              <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order until everyone has 13 and the dealer has 14. Before meaningful discards begin, each player chooses a missing suit: 定缺.</p>
             ) : (
               <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order (East → South → West → North). Four tiles at a time until everyone has 12, then one more each. The dealer takes 14.</p>
             )}
           </div>
-          <SmallWall variant="deal" showDirection />
+          <SmallWall step="deal" showDirection />
         </div>
 
         <div className="mj-draw-step">
@@ -1119,6 +1266,8 @@ function SectionDraw() {
             <div className="mj-draw-step-title">Draw on your turn</div>
             {variant === 'taiwan' ? (
               <p>Click a stack in the wall to draw the next tile. You now have 17 — discard one to return to 16. If you draw a flower or season tile, reveal it, set it aside, and draw a replacement instead. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+            ) : isSichuan ? (
+              <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13, usually pushing away tiles from your missing suit first. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
             ) : (
               <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
             )}
@@ -1133,9 +1282,10 @@ function SectionDraw() {
             <div className="mj-wall-inner">
               {wallSides.map((side) => (
                 <div key={side} className={`mj-wall-side mj-wall-${side}`}>
-                  {Array.from({ length: 17 }).map((_, i) => {
+                  {Array.from({ length: stackCountForSide(side) }).map((_, i) => {
+                    const stackCount = stackCountForSide(side);
                     const drawnCount = hand.length;
-                    const isDrawn = side === 'top' && i >= 17 - Math.min(drawnCount, 17);
+                    const isDrawn = side === 'top' && i >= stackCount - Math.min(drawnCount, stackCount);
                     return (
                       <div
                         key={i}
@@ -1185,9 +1335,11 @@ function SectionDraw() {
       {/* Simple list — re-done as per user request */}
       <ul className="mj-draw-list">
         <li><strong>Draw order.</strong> Counter-clockwise. East (the dealer) always starts.</li>
-        <li><strong>Dead wall.</strong> The last 14 tiles are reserved for kongs and replacements.</li>
+        {isSichuan && <li><strong>Ding Que.</strong> Choose one suit to abandon. You cannot win until that suit is gone from your hand.</li>}
+        <li><strong>Dead wall.</strong> The last tiles are reserved for kongs and replacements.</li>
         <li><strong>Kong replacement.</strong> Declare a kong → draw one extra tile from the dead wall's end.</li>
         {variant === 'taiwan' && <li><strong>Flower replacement.</strong> Draw a flower or season tile → reveal it, set it aside face-up, and draw a replacement from the dead wall. Happens during the deal and on any subsequent draw.</li>}
+        {isSichuan && <li><strong>Bloody battle.</strong> A win does not necessarily end the hand; unfinished players keep playing under 血戰到底 rules.</li>}
         <li><strong>Exhausted wall.</strong> If the live wall runs out with no winner, it's a draw (黃莊 · huáng zhuāng).</li>
       </ul>
     </section>
@@ -1272,6 +1424,81 @@ const TURN_ACTIONS = [
   },
 ];
 
+const SICHUAN_ACTIONS = [
+  {
+    id: 'dingque',
+    name: 'Ding Que',
+    zh: '定缺',
+    pinyin: 'dìng quē',
+    en: '"fix the lack"',
+    timing: 'on-turn',
+    when: 'Before your first discard',
+    desc: 'Choose one suit to abandon. You must empty that suit before you can declare Hu.',
+    example: ['tiao-1', 'tiao-9'],
+    exampleNote: 'chosen missing suit',
+  },
+  {
+    id: 'draw',
+    name: 'Draw',
+    zh: '摸牌',
+    pinyin: 'mō pái',
+    en: '"feel for a tile"',
+    timing: 'on-turn',
+    when: 'Always — starts your turn',
+    desc: 'Take one tile from the wall — now 14. You must then discard one to return to 13.',
+    example: ['bing-5'],
+    exampleNote: 'one new tile',
+  },
+  {
+    id: 'discard',
+    name: 'Discard',
+    zh: '打牌',
+    pinyin: 'dǎ pái',
+    en: '"strike the tile"',
+    timing: 'on-turn',
+    when: 'End of your turn',
+    desc: 'Throw away one tile face-up. In Sichuan, early discards usually clear your chosen missing suit.',
+    example: ['tiao-9'],
+    exampleNote: 'push the missing suit out',
+  },
+  {
+    id: 'pung',
+    name: 'Pung',
+    zh: '碰',
+    pinyin: 'pèng',
+    en: '"bump"',
+    timing: 'out-of-turn',
+    when: 'From any player, any seat',
+    desc: 'Claim any player\'s discard to complete a triplet. Sichuan removes chow, so pung is the main discard claim before Hu.',
+    example: ['bing-7', 'bing-7', 'bing-7'],
+    exampleNote: 'three 7-dots',
+  },
+  {
+    id: 'kong',
+    name: 'Kong',
+    zh: '杠',
+    pinyin: 'gàng',
+    en: '"bar"',
+    timing: 'either',
+    when: 'From any discard, or concealed in your hand',
+    desc: 'Four of a kind. Draw a replacement tile from the back end of the wall.',
+    example: ['wan-2', 'wan-2', 'wan-2', 'wan-2'],
+    exampleNote: 'four 2-characters',
+  },
+  {
+    id: 'hu',
+    name: 'Hu · Mahjong!',
+    zh: '胡',
+    pinyin: 'hú',
+    en: '"complete"',
+    timing: 'either',
+    when: 'Complete hand + missing suit satisfied',
+    desc: 'Declare win only if your hand is complete and your chosen missing suit is gone. Under 血戰到底, other unfinished players continue.',
+    example: ['wan-5', 'wan-5'],
+    exampleNote: 'final pair lands',
+  },
+];
+
 const SET_EXAMPLES = [
   {
     kind: 'Chow (chī) · 吃',
@@ -1327,32 +1554,106 @@ const SET_EXAMPLES = [
   },
 ];
 
+const SET_EXAMPLES_SICHUAN = [
+  {
+    kind: 'Pung (pèng) · 碰',
+    desc: 'Three identical suited tiles. This is the main discard claim in Sichuan.',
+    valid: [
+      { tiles: ['wan-5', 'wan-5', 'wan-5'], note: 'Triple 5 of Characters' },
+      { tiles: ['tiao-8', 'tiao-8', 'tiao-8'], note: 'Triple 8 of Bamboo' },
+      { tiles: ['bing-2', 'bing-2', 'bing-2'], note: 'Triple 2 of Dots' },
+    ],
+    invalid: [
+      { tiles: ['wan-5', 'wan-5', 'wan-6'], note: 'Only two match — this is a pair + one' },
+      { tiles: ['tiao-3', 'bing-3', 'wan-3'], note: 'Same number across suits does not count' },
+      { tiles: ['bing-2', 'bing-2'], note: 'Only two — that is a pair, not a pung' },
+    ],
+  },
+  {
+    kind: 'Kong (gàng) · 杠',
+    desc: 'Four of the same suited tile. Kongs add bonus value and require a replacement draw.',
+    valid: [
+      { tiles: ['tiao-4', 'tiao-4', 'tiao-4', 'tiao-4'], note: 'All four 4-bamboos' },
+      { tiles: ['wan-9', 'wan-9', 'wan-9', 'wan-9'], note: 'A root / kong of 9 Characters' },
+    ],
+    invalid: [
+      { tiles: ['bing-2', 'bing-2', 'bing-2', 'bing-3'], note: 'One tile is different' },
+      { tiles: ['wan-7', 'wan-7', 'wan-7'], note: 'Only three — this is a pung' },
+    ],
+  },
+  {
+    kind: 'Pair · 對 (the "eyes")',
+    desc: 'Two identical tiles. Standard hands still need exactly one pair.',
+    valid: [
+      { tiles: ['bing-5', 'bing-5'], note: 'Any two of the same suited tile' },
+      { tiles: ['tiao-1', 'tiao-1'], note: 'Pair of 1 Bamboo' },
+    ],
+    invalid: [
+      { tiles: ['bing-5', 'bing-6'], note: 'Different tiles — not a pair' },
+      { tiles: ['wan-2', 'bing-2'], note: 'Same number, different suit — not a pair' },
+    ],
+  },
+  {
+    kind: 'Missing suit · 缺一門',
+    desc: 'After 定缺, a winning hand must contain none of the suit you chose to lack.',
+    valid: [
+      { tiles: ['wan-2', 'wan-3', 'wan-4', 'bing-7'], note: 'Bamboo is missing' },
+      { tiles: ['tiao-1', 'tiao-1', 'bing-5', 'bing-6'], note: 'Characters are missing' },
+    ],
+    invalid: [
+      { tiles: ['wan-2', 'tiao-4', 'bing-7'], note: 'All three suits are still present' },
+      { tiles: ['tiao-3', 'tiao-4', 'wan-9'], note: 'Illegal if Bamboo was your chosen missing suit' },
+    ],
+  },
+];
+
 function SectionActions() {
   const variant = React.useContext(VariantContext);
+  const actions = variant === 'sichuan'
+    ? SICHUAN_ACTIONS
+    : [
+      ...TURN_ACTIONS,
+      ...(variant === 'taiwan' ? [{
+        id: 'flower',
+        name: 'Reveal Flower / Season',
+        zh: '補花',
+        pinyin: 'bǔ huā',
+        en: '"replenish flower"',
+        timing: 'on-turn',
+        when: 'Immediately on drawing a bonus tile',
+        desc: 'Show the flower or season tile, set it aside face-up, then draw a replacement from the dead wall. It never enters your hand.',
+        example: ['mei', 'spring'],
+        exampleNote: 'reveal & replace',
+      }] : []),
+    ];
+  const priorityRows = variant === 'sichuan'
+    ? [
+      { rank: '1', name: 'Hu (win)', desc: 'Highest priority. A complete hand can win from draw or discard once 缺一門 is satisfied.' },
+      { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat. Chow is not a legal claim in Sichuan.' },
+    ]
+    : [
+      { rank: '1', name: 'Hu (win)', desc: 'Always wins — if the discarded tile completes your hand, you win immediately.' },
+      { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat — beats chow.' },
+      { rank: '3', name: 'Chow', desc: 'Only the next player (to the discarder\'s right).' },
+    ];
+
   return (
     <section id="section-actions" className="mj-section" data-screen-label="04 Actions">
       <div className="mj-section-head">
         <div className="mj-kicker">Section 04 · Your turn</div>
         <h2 className="mj-h2">What can you do each turn?</h2>
         <p className="mj-lede">
-          Your basic move is to draw one tile then discard one — you always keep exactly <strong>{variant === 'taiwan' ? '16' : '13'} tiles</strong> in hand. Between turns you can <em>interrupt</em> to claim a discard from any player (pung) or just from the player before you (chow).
+          {variant === 'sichuan' ? (
+            <>Your basic move is still draw one, discard one — you keep exactly <strong>13 tiles</strong> in hand. The Sichuan twist is <em>定缺</em>: pick one suit to empty, and remember that <strong>chow is not a legal discard claim</strong>.</>
+          ) : (
+            <>Your basic move is to draw one tile then discard one — you always keep exactly <strong>{variant === 'taiwan' ? '16' : '13'} tiles</strong> in hand. Between turns you can <em>interrupt</em> to claim a discard from any player (pung) or just from the player before you (chow).</>
+          )}
         </p>
       </div>
 
       {/* Simple, non-button list of actions */}
       <div className="mj-action-list">
-        {[...TURN_ACTIONS, ...(variant === 'taiwan' ? [{
-          id: 'flower',
-          name: 'Reveal Flower / Season',
-          zh: '補花',
-          pinyin: 'bǔ huā',
-          en: '"replenish flower"',
-          timing: 'on-turn',
-          when: 'Immediately on drawing a bonus tile',
-          desc: 'Show the flower or season tile, set it aside face-up, then draw a replacement from the dead wall. It never enters your hand.',
-          example: ['mei', 'spring'],
-          exampleNote: 'reveal & replace',
-        }] : [])].map((a) => (
+        {actions.map((a) => (
           <div key={a.id} className="mj-action-row">
             <div className="mj-action-zh-col">
               <div className="mj-action-zh">{a.zh}</div>
@@ -1380,42 +1681,40 @@ function SectionActions() {
       <div className="mj-priority">
         <div className="mj-priority-h">What if two players want the same discard?</div>
         <div className="mj-priority-ladder">
-          <div className="mj-prio-row">
-            <div className="mj-prio-rank">1</div>
-            <div className="mj-prio-name">Hu (win)</div>
-            <div className="mj-prio-desc">Always wins — if the discarded tile completes your hand, you win immediately.</div>
-          </div>
-          <div className="mj-prio-row">
-            <div className="mj-prio-rank">2</div>
-            <div className="mj-prio-name">Pung / Kong</div>
-            <div className="mj-prio-desc">Anyone, any seat — beats chow.</div>
-          </div>
-          <div className="mj-prio-row">
-            <div className="mj-prio-rank">3</div>
-            <div className="mj-prio-name">Chow</div>
-            <div className="mj-prio-desc">Only the next player (to the discarder's right).</div>
-          </div>
+          {priorityRows.map((row) => (
+            <div key={row.rank} className="mj-prio-row">
+              <div className="mj-prio-rank">{row.rank}</div>
+              <div className="mj-prio-name">{row.name}</div>
+              <div className="mj-prio-desc">{row.desc}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Valid vs invalid — tabbed, single block */}
       <div className="mj-vi-head">
         <h3 className="mj-h3">Valid vs. invalid sets</h3>
-        <p className="mj-vi-sub">A set is the building block of a winning hand. Here's what counts — and what doesn't.</p>
+        <p className="mj-vi-sub">
+          {variant === 'sichuan'
+            ? 'Sichuan removes chow as a claim action. Runs can still appear in many table rules; the extra test is whether your chosen missing suit is gone.'
+            : "A set is the building block of a winning hand. Here's what counts — and what doesn't."}
+        </p>
       </div>
 
-      <ValidInvalidTabs />
+      <ValidInvalidTabs variant={variant} />
     </section>
   );
 }
 
-function ValidInvalidTabs() {
+function ValidInvalidTabs({ variant }) {
+  const examples = variant === 'sichuan' ? SET_EXAMPLES_SICHUAN : SET_EXAMPLES;
   const [idx, setIdx] = React.useState(0);
-  const ex = SET_EXAMPLES[idx];
+  React.useEffect(() => { setIdx(0); }, [variant]);
+  const ex = examples[idx];
   return (
     <div className="mj-vi-block">
       <div className="mj-vi-tabs">
-        {SET_EXAMPLES.map((e, i) => (
+        {examples.map((e, i) => (
           <button
             key={i}
             className={`mj-vi-tab ${idx === i ? 'is-active' : ''}`}
@@ -1557,15 +1856,12 @@ function App() {
         </div>
         <div className="mj-theme-picker">
           <div className="mj-theme-label">Ruleset</div>
-          {[
-            { id: 'hk', label: 'Hong Kong' },
-            { id: 'taiwan', label: 'Taiwan' },
-          ].map((v) => (
+          {RULESETS.map((v) => (
             <button
               key={v.id}
               className={`mj-theme-btn ${variant === v.id ? 'is-active' : ''}`}
               onClick={() => setVariant(v.id)}
-            >{v.label}</button>
+            >{v.shortLabel}</button>
           ))}
         </div>
       </aside>
@@ -1578,15 +1874,12 @@ function App() {
         <div className="mj-theme-bar">
           <span className="mj-theme-bar-label">Ruleset</span>
           <div className="mj-theme-bar-btns">
-            {[
-              { id: 'hk', label: 'Hong Kong' },
-              { id: 'taiwan', label: 'Taiwan' },
-            ].map((v) => (
+            {RULESETS.map((v) => (
               <button
                 key={v.id}
                 className={`mj-theme-bar-btn ${variant === v.id ? 'is-active' : ''}`}
                 onClick={() => setVariant(v.id)}
-              >{v.label}</button>
+              >{v.shortLabel}</button>
             ))}
           </div>
         </div>
@@ -1626,7 +1919,7 @@ function App() {
           </span>
           <span className="mj-foot-cta-text">
             <span className="mj-foot-cta-kicker">You're invited</span>
-            <span className="mj-foot-cta-title">RSVP for Modal Mahjong Night</span>
+            <span className="mj-foot-cta-title">Visit Haerin's Blog</span>
           </span>
           <span className="mj-foot-cta-arrow">→</span>
         </a>
@@ -1856,7 +2149,7 @@ function ToastInvite() {
         </span>
         <span className="mj-foot-cta-text">
           <span className="mj-foot-cta-kicker">You're invited</span>
-          <span className="mj-foot-cta-title">RSVP for Modal Mahjong Night</span>
+          <span className="mj-foot-cta-title">Visit Haerin's Blog</span>
         </span>
         <span className="mj-foot-cta-arrow">→</span>
       </a>
@@ -1881,10 +2174,6 @@ function Hero({ theme, setTheme2, setVariant }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const RULESETS = [
-    { id: 'hk', label: 'Hong Kong rules · 香港麻將' },
-    { id: 'taiwan', label: 'Taiwan rules · 台灣麻將' },
-  ];
   const THEMES = [
     { id: 'jade', label: 'Jade', swatch: '#006C00' },
     { id: 'lacquer', label: 'Lacquer', swatch: '#0c1a0e' },
@@ -1970,6 +2259,12 @@ function Hero({ theme, setTheme2, setVariant }) {
               <div><strong>144</strong>tiles in a set</div>
               <div><strong>16</strong>tiles dealt, 17 to win</div>
               <div><strong>5</strong>sets + 1 pair</div>
+            </>
+          ) : variant === 'sichuan' ? (
+            <>
+              <div><strong>108</strong>suited tiles only</div>
+              <div><strong>13</strong>tiles dealt, 14 to win</div>
+              <div><strong>缺</strong>one suit to win</div>
             </>
           ) : (
             <>
