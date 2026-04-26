@@ -24,6 +24,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: 'Mahjong: a Visual Guide',
   description: 'Learn mahjong - A visual guide for total beginners',
+  icons: {
+    icon: '/tiles/modal-tile.svg',
+    shortcut: '/tiles/modal-tile.svg',
+    apple: '/tiles/modal-tile.svg',
+  },
 }
 
 export default function RootLayout({

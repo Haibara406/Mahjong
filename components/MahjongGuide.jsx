@@ -2579,7 +2579,8 @@ function Hero({ theme, setTheme2, setVariant, lang, setLang }) {
         {lang === 'zh' ? (
           <h1>
             学会 <em>麻将</em><br/>
-            一份可视化<em>指南</em><span className="mj-zh">麻將</span>
+            一份可视化<em>指南</em><br/>
+            <span className="mj-zh">麻將</span>
           </h1>
         ) : (
           <h1>
