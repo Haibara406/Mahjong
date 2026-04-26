@@ -8,6 +8,7 @@ A 1:1 recreation of [themahjong.guide](https://themahjong.guide/) - an interacti
 - **Tile Filtering**: Filter tiles by category, including the 108-tile Sichuan suited set
 - **Theme Switching**: Three beautiful themes (Jade, Lacquer, Study)
 - **Ruleset Toggle**: Switch between Hong Kong, Taiwan, and Sichuan rules
+- **Language Toggle**: English and Chinese page copy
 - **Responsive Design**: Sidebar navigation with smooth scrolling
 - **Complete Sections**:
   - Section 01: What are the tiles?

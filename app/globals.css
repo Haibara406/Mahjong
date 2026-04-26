@@ -401,7 +401,8 @@ html, body {
 .mj-kicker-static { display: none; }
 
 .mj-kicker-ruleset-wrap,
-.mj-kicker-theme-wrap { position: relative; }
+.mj-kicker-theme-wrap,
+.mj-kicker-lang-wrap { position: relative; }
 
 .mj-kicker-ruleset-btn {
   background: none;
@@ -421,6 +422,7 @@ html, body {
 .mj-kicker-chevron { opacity: 0.7; flex-shrink: 0; }
 
 .mj-kicker-theme-wrap { display: none; }
+.mj-kicker-lang-wrap { display: none; }
 
 .mj-kicker-theme-btn {
   background: none;
@@ -434,6 +436,27 @@ html, body {
   transition: opacity 0.15s;
 }
 .mj-kicker-theme-btn:hover { opacity: 1; }
+
+.mj-kicker-lang-btn {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--vermillion) 35%, transparent);
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: var(--vermillion);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+.mj-kicker-lang-btn:hover {
+  opacity: 1;
+  border-color: var(--vermillion);
+  background: var(--vermillion-wash);
+}
 
 .mj-kicker-dropdown {
   position: absolute;
@@ -1644,6 +1667,7 @@ html, body {
   .mj-hero h1 .mj-zh { font-size: 36px; }
 
   .mj-kicker-theme-wrap { display: block; }
+  .mj-kicker-lang-wrap { display: block; }
 
   /* Show ASCII art on mobile, single-column stacked below text */
   .mj-hero-ascii { min-height: 0; padding: 20px 20px 12px; }

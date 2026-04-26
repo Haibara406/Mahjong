@@ -69,27 +69,85 @@ const FLOWER_TILES = {
 };
 
 const FLOWER_META = {
-  flower: { label: 'Flowers', sub: '花 · Huā', desc: 'Four flower tiles. Each player\'s seat number has a matching flower — drawing your own flower is worth 1 臺 bonus.' },
-  season: { label: 'Seasons', sub: '季 · Jì', desc: 'Four season tiles. Same matching rule as flowers — your seat number matches one season for a 1 臺 bonus.' },
+  flower: { label: 'Flowers', labelZh: '花牌', sub: '花 · Huā', desc: 'Four flower tiles. Each player\'s seat number has a matching flower — drawing your own flower is worth 1 臺 bonus.', descZh: '梅、兰、菊、竹四张花牌。台湾规则中，花牌亮出后补牌，若花号与座位对应可计 1 台。' },
+  season: { label: 'Seasons', labelZh: '季牌', sub: '季 · Jì', desc: 'Four season tiles. Same matching rule as flowers — your seat number matches one season for a 1 臺 bonus.', descZh: '春、夏、秋、冬四张季牌。规则与花牌相同：亮出、补牌，座位对应时计分。' },
 };
 
 const BLOG_URL = 'https://haerin.haikari.top/about';
 
 const RULESETS = [
-  { id: 'hk', shortLabel: 'Hong Kong', label: 'Hong Kong rules · 香港麻將' },
-  { id: 'taiwan', shortLabel: 'Taiwan', label: 'Taiwan rules · 台灣麻將' },
-  { id: 'sichuan', shortLabel: 'Sichuan', label: 'Sichuan rules · 四川麻将' },
+  { id: 'hk', shortLabel: 'Hong Kong', shortLabelZh: '香港', label: 'Hong Kong rules · 香港麻將', labelZh: '香港麻将规则 · 香港麻將' },
+  { id: 'taiwan', shortLabel: 'Taiwan', shortLabelZh: '台湾', label: 'Taiwan rules · 台灣麻將', labelZh: '台湾麻将规则 · 台灣麻將' },
+  { id: 'sichuan', shortLabel: 'Sichuan', shortLabelZh: '四川', label: 'Sichuan rules · 四川麻将', labelZh: '四川麻将规则 · 四川麻将' },
+];
+
+const THEMES = [
+  { id: 'jade', label: 'Jade', labelZh: '青玉', swatch: '#006C00' },
+  { id: 'lacquer', label: 'Lacquer', labelZh: '漆色', swatch: '#0c1a0e' },
+  { id: 'study', label: 'Study', labelZh: '书房', swatch: '#d89b2a' },
+];
+
+const LANG_OPTIONS = [
+  { id: 'en', label: 'English', shortLabel: 'EN' },
+  { id: 'zh', label: '中文', shortLabel: '中' },
 ];
 
 const SUITED_GROUPS = ['wan', 'tiao', 'bing'];
 
 const SUIT_META = {
-  wan: { label: 'Characters', sub: '萬 · Wàn', desc: 'Numbered 1–9. The character 萬 means "ten thousand."' },
-  tiao: { label: 'Bamboo', sub: '條 · Tiáo', desc: 'Numbered 1–9. Sticks of bamboo. The 1-bamboo is traditionally drawn as a bird.' },
-  bing: { label: 'Dots', sub: '餅 · Bǐng', desc: 'Numbered 1–9. Circles represent coins, one of the three original suits.' },
-  wind: { label: 'Winds', sub: '風 · Fēng', desc: 'Four winds — East, South, West, North. Honor tiles.' },
-  dragon: { label: 'Dragons', sub: '箭 · Jiàn', desc: 'Three dragons — Red (中), Green (發), White (板). Honor tiles.' },
+  wan: { label: 'Characters', labelZh: '万子', sub: '萬 · Wàn', desc: 'Numbered 1–9. The character 萬 means "ten thousand."', descZh: '数字一到九。牌面下方的「万」表示万子，是三门花色之一。' },
+  tiao: { label: 'Bamboo', labelZh: '条子', sub: '條 · Tiáo', desc: 'Numbered 1–9. Sticks of bamboo. The 1-bamboo is traditionally drawn as a bird.', descZh: '数字一到九。条子也叫索子，一条常画成鸟形，是传统牌面样式。' },
+  bing: { label: 'Dots', labelZh: '筒子', sub: '餅 · Bǐng', desc: 'Numbered 1–9. Circles represent coins, one of the three original suits.', descZh: '数字一到九。筒子也叫饼子，圆点来自铜钱图案。' },
+  wind: { label: 'Winds', labelZh: '风牌', sub: '風 · Fēng', desc: 'Four winds — East, South, West, North. Honor tiles.', descZh: '东、南、西、北四张风牌，属于字牌，不能组成顺子。' },
+  dragon: { label: 'Dragons', labelZh: '箭牌', sub: '箭 · Jiàn', desc: 'Three dragons — Red (中), Green (發), White (板). Honor tiles.', descZh: '中、发、白三张箭牌，属于字牌，刻子通常有额外番种。' },
 };
+
+function textByLang(lang, en, zh) {
+  return lang === 'zh' ? zh : en;
+}
+
+function rulesetLabel(ruleset, lang, compact = false) {
+  if (!ruleset) return '';
+  if (compact) return lang === 'zh' ? ruleset.shortLabelZh : ruleset.shortLabel;
+  return lang === 'zh' ? ruleset.labelZh : ruleset.label;
+}
+
+function themeLabel(theme, lang) {
+  return lang === 'zh' ? theme.labelZh : theme.label;
+}
+
+function tileDisplayName(tile, lang) {
+  if (!tile) return '';
+  return lang === 'zh' ? tile.zh : tile.en;
+}
+
+function tileSuitInfo(suit, num, lang) {
+  if (lang !== 'zh') {
+    if (suit === 'wan') return 'Suit · Characters (萬). Read the top symbol as the number, bottom as the suit.';
+    if (suit === 'tiao') return 'Suit · Bamboo (條). The 1-bamboo shows a bird — a classical flourish.';
+    if (suit === 'bing') return 'Suit · Dots (餅). Each circle is a stack of coins.';
+    if (suit === 'wind') return 'Honor tile · one of four winds. Your seat wind and the round wind both matter for scoring.';
+    if (suit === 'dragon') return 'Honor tile · one of three dragons. A pung of dragons is always worth points.';
+    if (suit === 'flower') return `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${num} matches seat ${num} — worth 1 臺 if the number matches your seat.`;
+    if (suit === 'season') return `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${num} matches seat ${num} — worth 1 臺 if the number matches your seat.`;
+    return '';
+  }
+  if (suit === 'wan') return '花色牌 · 万子。上方是数字，下方的「万」表示花色。';
+  if (suit === 'tiao') return '花色牌 · 条子。一条常画成鸟形，是传统牌面样式。';
+  if (suit === 'bing') return '花色牌 · 筒子。圆点源自钱币图案。';
+  if (suit === 'wind') return '字牌 · 四风之一。门风、圈风会影响计分。';
+  if (suit === 'dragon') return '字牌 · 中、发、白之一。箭牌刻子通常有额外番种。';
+  if (suit === 'flower') return `花牌 · 台湾规则使用。摸到后亮出并从岭上补牌；第 ${num} 张花与第 ${num} 门座位对应时计 1 台。`;
+  if (suit === 'season') return `季牌 · 台湾规则使用。摸到后亮出并从岭上补牌；第 ${num} 张季与第 ${num} 门座位对应时计 1 台。`;
+  return '';
+}
+
+function tileShort(id, lang) {
+  const tile = Object.values(TILES).flat().find((t) => t.id === id)
+    || Object.values(FLOWER_TILES).flat().find((t) => t.id === id);
+  if (!tile) return id;
+  return lang === 'zh' ? tile.zh : tile.en.replace('One of ', '1 ').replace('Two of ', '2 ').replace('Three of ', '3 ').replace('Four of ', '4 ').replace('Five of ', '5 ').replace('Six of ', '6 ').replace('Seven of ', '7 ').replace('Eight of ', '8 ').replace('Nine of ', '9 ');
+}
 
 // Tile visual — wraps the SVG in a "physical" container with shadow + lift.
 function Tile({ id, size = 'md', selected, dimmed, onClick, onMouseEnter, onMouseLeave, style, face = true, discard = false }) {
@@ -204,6 +262,7 @@ function Meld({ tiles, size = 'md', label, highlighted, onTileClick, rotated }) 
 
 function SectionTiles() {
   const variant = React.useContext(VariantContext);
+  const lang = React.useContext(LanguageContext);
   const [hovered, setHovered] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [suit, setSuit] = React.useState('all');
@@ -239,35 +298,45 @@ function SectionTiles() {
 
   const suits = variant === 'sichuan'
     ? [
-      { id: 'all', label: 'All 27', count: 27 },
-      { id: 'wan', label: 'Characters', count: 9 },
-      { id: 'tiao', label: 'Bamboo', count: 9 },
-      { id: 'bing', label: 'Dots', count: 9 },
+      { id: 'all', label: textByLang(lang, 'All 27', '全部 27'), count: 27 },
+      { id: 'wan', label: textByLang(lang, 'Characters', '万子'), count: 9 },
+      { id: 'tiao', label: textByLang(lang, 'Bamboo', '条子'), count: 9 },
+      { id: 'bing', label: textByLang(lang, 'Dots', '筒子'), count: 9 },
     ]
     : [
-      { id: 'all', label: 'All 34', count: 34 },
-      { id: 'wan', label: 'Characters', count: 9 },
-      { id: 'tiao', label: 'Bamboo', count: 9 },
-      { id: 'bing', label: 'Dots', count: 9 },
-      { id: 'wind', label: 'Winds', count: 4 },
-      { id: 'dragon', label: 'Dragons', count: 3 },
-      ...(variant === 'taiwan' ? [{ id: 'flower', label: 'Bonus', count: 8 }] : []),
+      { id: 'all', label: textByLang(lang, 'All 34', '全部 34'), count: 34 },
+      { id: 'wan', label: textByLang(lang, 'Characters', '万子'), count: 9 },
+      { id: 'tiao', label: textByLang(lang, 'Bamboo', '条子'), count: 9 },
+      { id: 'bing', label: textByLang(lang, 'Dots', '筒子'), count: 9 },
+      { id: 'wind', label: textByLang(lang, 'Winds', '风牌'), count: 4 },
+      { id: 'dragon', label: textByLang(lang, 'Dragons', '箭牌'), count: 3 },
+      ...(variant === 'taiwan' ? [{ id: 'flower', label: textByLang(lang, 'Bonus', '花季牌'), count: 8 }] : []),
     ];
 
   return (
     <section id="section-tiles" className="mj-section" data-screen-label="01 Tiles">
       <div className="mj-section-head">
-        <div className="mj-kicker">Section 01 · The deck</div>
-        <h2 className="mj-h2">What are the tiles?</h2>
+        <div className="mj-kicker">{textByLang(lang, 'Section 01 · The deck', '第 01 节 · 牌组')}</div>
+        <h2 className="mj-h2">{textByLang(lang, 'What are the tiles?', '麻将有哪些牌？')}</h2>
         <p className="mj-lede">
-          {variant === 'taiwan' ? (
-            <>A mahjong set in Taiwan rules has <strong>144 tiles</strong>: the same 34 unique designs × 4, plus <strong>8 bonus tiles</strong> — four Flowers and four Seasons. These are never part of a winning hand; they score separately.</>
-          ) : variant === 'sichuan' ? (
-            <>Sichuan mahjong uses a lean <strong>108-tile</strong> set: only the three numbered suits, 1–9, four of each. Winds, dragons, flowers, and seasons are removed, so every tile you see here can enter the hand.</>
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <>台湾麻将一副牌有 <strong>144 张</strong>：34 种基础牌各 4 张，再加 <strong>8 张花季牌</strong>，也就是四张花牌和四张季牌。花季牌不组成手牌，摸到后亮出并补牌，另行计分。</>
+            ) : variant === 'sichuan' ? (
+              <>四川麻将使用更精简的 <strong>108 张</strong>：只保留万、条、筒三门序数牌，每种 4 张。风牌、箭牌、花牌、季牌全部不用，所以这里看到的每张牌都可能进入手牌。</>
+            ) : (
+              <>一副麻将有 <strong>136 张</strong>：34 种牌各 4 张。三门花色牌从一到九，分别是万子、条子、筒子；另有四风和三元等字牌。</>
+            )
           ) : (
-            <>A mahjong set has <strong>136 tiles</strong>: 34 unique designs, four of each. Three suits run 1–9 (Characters, Bamboo, Dots), plus the honor tiles — four Winds and three Dragons.</>
+            variant === 'taiwan' ? (
+              <>A mahjong set in Taiwan rules has <strong>144 tiles</strong>: the same 34 unique designs × 4, plus <strong>8 bonus tiles</strong> — four Flowers and four Seasons. These are never part of a winning hand; they score separately.</>
+            ) : variant === 'sichuan' ? (
+              <>Sichuan mahjong uses a lean <strong>108-tile</strong> set: only the three numbered suits, 1–9, four of each. Winds, dragons, flowers, and seasons are removed, so every tile you see here can enter the hand.</>
+            ) : (
+              <>A mahjong set has <strong>136 tiles</strong>: 34 unique designs, four of each. Three suits run 1–9 (Characters, Bamboo, Dots), plus the honor tiles — four Winds and three Dragons.</>
+            )
           )}
-          {' '}Hover or tap any tile to learn its name.
+          {' '}{textByLang(lang, 'Hover or tap any tile to learn its name.', '把鼠标移到牌上，或轻点牌面，可以查看名称和说明。')}
         </p>
       </div>
 
@@ -293,10 +362,10 @@ function SectionTiles() {
               Object.keys(FLOWER_TILES).map((group) => (
                 <div key={group} className="mj-suit-row">
                   <div className="mj-suit-label">
-                    <div className="mj-suit-title">{FLOWER_META[group].label}</div>
+                    <div className="mj-suit-title">{textByLang(lang, FLOWER_META[group].label, FLOWER_META[group].labelZh)}</div>
                     <div className="mj-suit-sub">{FLOWER_META[group].sub}</div>
-                    <div className="mj-suit-desc">{FLOWER_META[group].desc}</div>
-                    <div className="mj-suit-count">4 tiles · each 1 of a kind</div>
+                    <div className="mj-suit-desc">{textByLang(lang, FLOWER_META[group].desc, FLOWER_META[group].descZh)}</div>
+                    <div className="mj-suit-count">{textByLang(lang, '4 tiles · each 1 of a kind', '4 张 · 每张各 1 枚')}</div>
                   </div>
                   <div className="mj-suit-tiles mj-suit-tiles-honors">
                     {FLOWER_TILES[group].map((t) => (
@@ -324,10 +393,10 @@ function SectionTiles() {
               groups.map((g) => (
                 <div key={g} className="mj-suit-row">
                   <div className="mj-suit-label">
-                    <div className="mj-suit-title">{SUIT_META[g].label}</div>
+                    <div className="mj-suit-title">{textByLang(lang, SUIT_META[g].label, SUIT_META[g].labelZh)}</div>
                     <div className="mj-suit-sub">{SUIT_META[g].sub}</div>
-                    <div className="mj-suit-desc">{SUIT_META[g].desc}</div>
-                    <div className="mj-suit-count">{TILES[g].length} × 4 = {TILES[g].length * 4} tiles</div>
+                    <div className="mj-suit-desc">{textByLang(lang, SUIT_META[g].desc, SUIT_META[g].descZh)}</div>
+                    <div className="mj-suit-count">{TILES[g].length} × 4 = {TILES[g].length * 4} {textByLang(lang, 'tiles', '张')}</div>
                   </div>
                   <div className={`mj-suit-tiles ${g === 'wind' || g === 'dragon' ? 'mj-suit-tiles-honors' : ''}`}>
                     {TILES[g].map((t) => (
@@ -362,24 +431,22 @@ function SectionTiles() {
                   <Tile id={info.id} size="xl" />
                 </div>
                 <div className="mj-info-zh">{info.zh}</div>
-                <div className="mj-info-en">{info.en}</div>
+                <div className="mj-info-en">{tileDisplayName(info, lang)}</div>
                 <div className="mj-info-meta">
-                  {info.suit === 'wan' && 'Suit · Characters (萬). Read the top symbol as the number, bottom as the suit.'}
-                  {info.suit === 'tiao' && 'Suit · Bamboo (條). The 1-bamboo shows a bird — a classical flourish.'}
-                  {info.suit === 'bing' && 'Suit · Dots (餅). Each circle is a stack of coins.'}
-                  {info.suit === 'wind' && 'Honor tile · one of four winds. Your seat wind and the round wind both matter for scoring.'}
-                  {info.suit === 'dragon' && 'Honor tile · one of three dragons. A pung of dragons is always worth points.'}
-                  {info.suit === 'flower' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
-                  {info.suit === 'season' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
+                  {tileSuitInfo(info.suit, info.num, lang)}
                 </div>
               </>
             ) : (
               <div className="mj-info-empty">
-                <div className="mj-info-empty-h">Hover or tap a tile</div>
+                <div className="mj-info-empty-h">{textByLang(lang, 'Hover or tap a tile', '悬停或轻点一张牌')}</div>
                 <div className="mj-info-empty-p">
-                  {variant === 'sichuan'
-                    ? 'Each tile appears four times. Sichuan keeps only the three numbered suits, which makes suit management and the missing-suit rule matter immediately.'
-                    : "Each appears four times in the wall. The numbered suits behave like three independent decks; the honors can't form runs."}
+                  {lang === 'zh'
+                    ? variant === 'sichuan'
+                      ? '每种牌各有四张。四川麻将只用三门花色牌，因此从开局起就要围绕定缺和缺一门来整理手牌。'
+                      : '每种牌在牌墙里都有四张。花色牌可以组成顺子，字牌不能组成顺子。'
+                    : variant === 'sichuan'
+                      ? 'Each tile appears four times. Sichuan keeps only the three numbered suits, which makes suit management and the missing-suit rule matter immediately.'
+                      : "Each appears four times in the wall. The numbered suits behave like three independent decks; the honors can't form runs."}
                 </div>
               </div>
             )}
@@ -391,20 +458,14 @@ function SectionTiles() {
           onClick={() => setSelected(null)}
         >
           <div className="mj-tile-popup-sheet" onClick={e => e.stopPropagation()}>
-            <button className="mj-tile-popup-close" onClick={() => setSelected(null)}>✕</button>
+            <button className="mj-tile-popup-close" onClick={() => setSelected(null)} aria-label={textByLang(lang, 'Close', '关闭')}>✕</button>
             {info && (
               <>
                 <div className="mj-info-big"><Tile id={info.id} size="xl" /></div>
                 <div className="mj-info-zh">{info.zh}</div>
-                <div className="mj-info-en">{info.en}</div>
+                <div className="mj-info-en">{tileDisplayName(info, lang)}</div>
                 <div className="mj-info-meta">
-                  {info.suit === 'wan' && 'Suit · Characters (萬). Read the top symbol as the number, bottom as the suit.'}
-                  {info.suit === 'tiao' && 'Suit · Bamboo (條). The 1-bamboo shows a bird — a classical flourish.'}
-                  {info.suit === 'bing' && 'Suit · Dots (餅). Each circle is a stack of coins.'}
-                  {info.suit === 'wind' && 'Honor tile · one of four winds. Your seat wind and the round wind both matter for scoring.'}
-                  {info.suit === 'dragon' && 'Honor tile · one of three dragons. A pung of dragons is always worth points.'}
-                  {info.suit === 'flower' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
-                  {info.suit === 'season' && `Bonus tile · Taiwan only. Reveal immediately when drawn, then draw a replacement. Tile #${info.num} matches seat ${info.num} — worth 1 臺 if the number matches your seat.`}
+                  {tileSuitInfo(info.suit, info.num, lang)}
                 </div>
               </>
             )}
@@ -413,15 +474,15 @@ function SectionTiles() {
 
         {variant === 'taiwan' && suit !== 'flower' && (
           <div className="mj-flower-section">
-            <div className="mj-kicker" style={{marginBottom: 28}}>Bonus tiles · Taiwan only</div>
+            <div className="mj-kicker" style={{marginBottom: 28}}>{textByLang(lang, 'Bonus tiles · Taiwan only', '花季牌 · 台湾规则')}</div>
             <div className="mj-tile-grid">
             {Object.keys(FLOWER_TILES).map((group) => (
               <div key={group} className="mj-suit-row">
                 <div className="mj-suit-label">
-                  <div className="mj-suit-title">{FLOWER_META[group].label}</div>
+                  <div className="mj-suit-title">{textByLang(lang, FLOWER_META[group].label, FLOWER_META[group].labelZh)}</div>
                   <div className="mj-suit-sub">{FLOWER_META[group].sub}</div>
-                  <div className="mj-suit-desc">{FLOWER_META[group].desc}</div>
-                  <div className="mj-suit-count">4 tiles · each 1 of a kind</div>
+                  <div className="mj-suit-desc">{textByLang(lang, FLOWER_META[group].desc, FLOWER_META[group].descZh)}</div>
+                  <div className="mj-suit-count">{textByLang(lang, '4 tiles · each 1 of a kind', '4 张 · 每张各 1 枚')}</div>
                 </div>
                 <div className="mj-suit-tiles mj-suit-tiles-honors">
                   {FLOWER_TILES[group].map((t) => (
@@ -724,14 +785,61 @@ const WINNING_HANDS_SICHUAN = [
   },
 ];
 
+const HAND_TEXT_ZH = {
+  hk: {
+    basic: { name: '标准和牌', points: '1 番', desc: '四组面子加一对将，组合可以是顺子、刻子或杠。对子也叫「将」或「眼」。' },
+    pingwu: { name: '平和', points: '1 番', desc: '四组面子全部是顺子，且将牌不是字牌。是最常见的低番牌型之一。' },
+    allpungs: { name: '对对胡', points: '3 番', desc: '四组面子全部是刻子，没有顺子。多数规则里都属于稳定的加番牌型。' },
+    sevenpairs: { name: '七对子', points: '3 番', desc: '十四张牌正好组成七个对子，不需要面子。每个对子必须独立，不能把一组四张当成两个对子。' },
+    halfflush: { name: '混一色', points: '3 番', desc: '只使用一种花色牌，再混入风牌或箭牌。所有序数牌必须来自同一门花色。' },
+    purity: { name: '清一色', points: '6 番', desc: '整副手牌全部来自同一门花色，不含风牌和箭牌，难度高、分值也高。' },
+    thirteen: { name: '十三幺', points: '满贯', desc: '一、九端张加全部字牌各一张，再任意重复其中一张。属于特殊牌型。' },
+  },
+  taiwan: {
+    basic: { name: '标准和牌', points: '1 台', desc: '五组面子加一对将，共 17 张。台湾麻将比港式多一组面子，通常至少要 1 台才能胡牌。' },
+    allpungs: { name: '对对胡', points: '3 台', desc: '五组面子全部是刻子，没有顺子。台湾规则中常计 3 台。' },
+    halfflush: { name: '混一色', points: '3 台', desc: '一种花色牌搭配风牌或箭牌。花色越集中，牌型价值越高。' },
+    sevenpairs: { name: '七对子', points: '3 台', desc: '七对子是 14 张的特殊牌型，不按台湾标准 17 张结构计算。每个对子必须独立。' },
+    purity: { name: '清一色', points: '8 台', desc: '五组面子和一对将都来自同一门花色，不含风牌、箭牌。是台湾规则中常见的大牌。' },
+    thirteen: { name: '十三幺', points: '满贯', desc: '全部幺九牌和字牌各一张，再重复其中任意一张。特殊牌型，通常按高分处理。' },
+  },
+  sichuan: {
+    basic: { name: '缺一门标准牌', points: '基础', desc: '四组面子加一对将，并且缺一门。本例没有条子，因此若定缺为条，就满足缺一门要求。' },
+    allpungs: { name: '碰碰胡', points: '2+ 番', desc: '四组面子全部是刻子。四川麻将不用字牌，所以碰碰胡完全由花色牌组成。' },
+    sevenpairs: { name: '七对', points: '4+ 番', desc: '七对是 14 张特殊牌型，仍然要满足缺一门。本例没有条子。' },
+    purity: { name: '清一色', points: '4+ 番', desc: '整副手牌都来自同一门花色，自然缺另外两门，通常是四川麻将里的高价值牌型。' },
+    longpairs: { name: '龙七对', points: '更高', desc: '七对的升级型：其中一对实际拿齐了同一张牌的四张。不同地方对具体番数会有差异。' },
+  },
+};
+
+function variantKey(variant) {
+  return variant === 'taiwan' ? 'taiwan' : variant === 'sichuan' ? 'sichuan' : 'hk';
+}
+
+function handText(hand, variant, lang) {
+  if (lang !== 'zh') return { name: hand.name, desc: hand.desc, points: hand.points };
+  return HAND_TEXT_ZH[variantKey(variant)]?.[hand.id] || { name: hand.name, desc: hand.desc, points: hand.points };
+}
+
+function meldLabel(meld, lang) {
+  if (lang !== 'zh') return meld.label;
+  if (meld.type === 'chow') return `顺子 · ${meld.tiles.map((t) => tileShort(t, 'zh')).join('-')}`;
+  if (meld.type === 'pung') return `刻子 · ${tileShort(meld.tiles[0], 'zh')}`;
+  if (meld.type === 'kong') return `杠 · ${tileShort(meld.tiles[0], 'zh')}`;
+  if (meld.type === 'pair') return `对子 · ${tileShort(meld.tiles[0], 'zh')}`;
+  return meld.label === 'Terminals & honors' ? '幺九牌与字牌' : meld.label === 'Plus any duplicate' ? '再重复任意一张' : '特殊牌组';
+}
+
 function SectionWin() {
   const variant = React.useContext(VariantContext);
+  const lang = React.useContext(LanguageContext);
   const hands = variant === 'taiwan' ? WINNING_HANDS_TAIWAN : variant === 'sichuan' ? WINNING_HANDS_SICHUAN : WINNING_HANDS;
   const [handIdx, setHandIdx] = React.useState(0);
   const [stage, setStage] = React.useState(0);
   const [playing, setPlaying] = React.useState(false);
   const tabsRef = React.useRef(null);
   const hand = hands[handIdx];
+  const currentHandText = handText(hand, variant, lang);
   const allTiles = hand.melds.flatMap((m) => m.tiles);
 
   // Reset hand selection when switching variants
@@ -766,30 +874,50 @@ function SectionWin() {
   return (
     <section id="section-win" className="mj-section" data-screen-label="02 Win">
       <div className="mj-section-head">
-        <div className="mj-kicker">Section 02 · The goal</div>
-        <h2 className="mj-h2">How do you win?</h2>
+        <div className="mj-kicker">{textByLang(lang, 'Section 02 · The goal', '第 02 节 · 胜利条件')}</div>
+        <h2 className="mj-h2">{textByLang(lang, 'How do you win?', '怎样算胡牌？')}</h2>
         <p className="mj-lede">
-          {variant === 'taiwan' ? (
-            <>A winning hand is <strong>5 sets + 1 pair</strong> — 17 tiles total (you hold 16, draw 1 to win). A "set" is a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). You must reach at least <strong>1 臺</strong> to declare — a bare hand with no scoring combination is not allowed.</>
-          ) : variant === 'sichuan' ? (
-            <>A winning hand is usually <strong>4 sets + 1 pair</strong> — 14 tiles total, with special hands like Seven Pairs. The extra Sichuan test is <strong>缺一門</strong>: after choosing a missing suit, your winning hand must contain none of that suit.</>
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <>胡牌通常是 <strong>5 组面子 + 1 对将</strong>，共 17 张（手里 16 张，摸到或吃碰到第 17 张胡牌）。面子可以是<em>顺子</em>、<em>刻子</em>或<em>杠</em>。台湾麻将一般至少要有 <strong>1 台</strong> 才能胡。</>
+            ) : variant === 'sichuan' ? (
+              <>常规胡牌是 <strong>4 组面子 + 1 对将</strong>，共 14 张，也有七对等特殊牌型。四川麻将额外要求 <strong>缺一门</strong>：定缺之后，胡牌时手里不能再有那一门花色。</>
+            ) : (
+              <>胡牌通常是 <strong>4 组面子 + 1 对将</strong>，共 14 张。面子可以是<em>顺子</em>（同花色连续三张）、<em>刻子</em>（三张相同）或<em>杠</em>（四张相同）；对子也叫「将」或「眼」。</>
+            )
           ) : (
-            <>A winning hand is <strong>4 sets + 1 pair</strong> — 14 tiles total. A "set" is either a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). The pair is called the <em>eyes</em>.</>
+            variant === 'taiwan' ? (
+              <>A winning hand is <strong>5 sets + 1 pair</strong> — 17 tiles total (you hold 16, draw 1 to win). A "set" is a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). You must reach at least <strong>1 臺</strong> to declare — a bare hand with no scoring combination is not allowed.</>
+            ) : variant === 'sichuan' ? (
+              <>A winning hand is usually <strong>4 sets + 1 pair</strong> — 14 tiles total, with special hands like Seven Pairs. The extra Sichuan test is <strong>缺一門</strong>: after choosing a missing suit, your winning hand must contain none of that suit.</>
+            ) : (
+              <>A winning hand is <strong>4 sets + 1 pair</strong> — 14 tiles total. A "set" is either a <em>chow</em> (three in a row, same suit), a <em>pung</em> (three of a kind), or a <em>kong</em> (four of a kind). The pair is called the <em>eyes</em>.</>
+            )
           )}
         </p>
         <div className="mj-callout">
-          {variant === 'taiwan' ? (
-            <>You always hold <strong>16 tiles</strong>. You win the moment you draw or claim a 17th tile that completes your hand — so every standard winning hand is exactly 17 tiles. (Seven Pairs is a special exception at 14 tiles.)</>
-          ) : variant === 'sichuan' ? (
-            <>You always hold <strong>13 tiles</strong>. Sichuan tables commonly play 血戰到底: after the first player wins, the hand continues until three players have won or the wall runs out.</>
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <>平时手里保持 <strong>16 张</strong>。摸到或吃碰杠到第 17 张时，如果牌型完成就可以胡牌；七对是 14 张特殊牌型。</>
+            ) : variant === 'sichuan' ? (
+              <>平时手里保持 <strong>13 张</strong>。四川麻将常见打法是血战到底：有人先胡后，其余未胡玩家继续打，直到三家胡牌或牌墙摸完。</>
+            ) : (
+              <>平时手里保持 <strong>13 张</strong>。摸到或吃碰到第 14 张时，如果牌型完成就胡牌。</>
+            )
           ) : (
-            <>You always hold <strong>13 tiles</strong>. You win the moment you draw or claim a 14th tile that completes your hand — so every winning hand is exactly 14 tiles total.</>
+            variant === 'taiwan' ? (
+              <>You always hold <strong>16 tiles</strong>. You win the moment you draw or claim a 17th tile that completes your hand — so every standard winning hand is exactly 17 tiles. (Seven Pairs is a special exception at 14 tiles.)</>
+            ) : variant === 'sichuan' ? (
+              <>You always hold <strong>13 tiles</strong>. Sichuan tables commonly play 血戰到底: after the first player wins, the hand continues until three players have won or the wall runs out.</>
+            ) : (
+              <>You always hold <strong>13 tiles</strong>. You win the moment you draw or claim a 14th tile that completes your hand — so every winning hand is exactly 14 tiles total.</>
+            )
           )}
         </div>
       </div>
 
       <div className="mj-hand-reveal">
-        <div className="mj-wins-kicker">Winning hands</div>
+        <div className="mj-wins-kicker">{textByLang(lang, 'Winning hands', '常见胡牌牌型')}</div>
         <div className="mj-hand-tabs" ref={tabsRef}>
           {hands.map((h, i) => (
             <button
@@ -798,8 +926,8 @@ function SectionWin() {
               onClick={() => setHandIdx(i)}
             >
               <div className="mj-tab-zh">{h.zh}</div>
-              <div className="mj-tab-name">{h.name}</div>
-              <div className="mj-tab-pts">{h.points}</div>
+              <div className="mj-tab-name">{handText(h, variant, lang).name}</div>
+              <div className="mj-tab-pts">{handText(h, variant, lang).points}</div>
             </button>
           ))}
         </div>
@@ -807,15 +935,15 @@ function SectionWin() {
         <div className="mj-hand-stage">
           <div className="mj-stage-header">
             <div>
-              <div className="mj-stage-name">{hand.name} <span className="mj-stage-zh">· {hand.zh}</span></div>
-              <div className="mj-stage-desc">{hand.desc}</div>
+              <div className="mj-stage-name">{currentHandText.name} <span className="mj-stage-zh">· {hand.zh}</span></div>
+              <div className="mj-stage-desc">{currentHandText.desc}</div>
             </div>
             <button className="mj-btn" onClick={replay}>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M1 2v4h4M13 12v-4h-4"/>
                 <path d="M11 5A5 5 0 0 0 2 6M3 9a5 5 0 0 0 9-1"/>
               </svg>
-              Replay
+              {textByLang(lang, 'Replay', '重播')}
             </button>
           </div>
 
@@ -854,7 +982,7 @@ function SectionWin() {
                     opacity: stage >= 2 ? 1 : 0,
                     transition: `opacity 300ms ${mi * 140 + 500}ms`,
                   }}>
-                    {meld.label}
+                    {meldLabel(meld, lang)}
                   </div>
                 </div>
               ))}
@@ -864,24 +992,24 @@ function SectionWin() {
           <div className="mj-stage-footer">
             <div className="mj-stage-count">
               <div className="mj-count-big">{allTiles.length}</div>
-              <div className="mj-count-lbl">tiles total</div>
+              <div className="mj-count-lbl">{textByLang(lang, 'tiles total', '张牌')}</div>
             </div>
             <div className="mj-stage-arrow">→</div>
             <div className="mj-stage-formula">
               {hand.melds.every(m => m.type === 'pair') ? (
-                <span><strong>7</strong> pairs</span>
+                <span><strong>7</strong> {textByLang(lang, 'pairs', '对')}</span>
               ) : (
-                <span><strong>{hand.melds.filter(m => m.type !== 'pair').length}</strong> sets + <strong>1</strong> pair</span>
+                <span><strong>{hand.melds.filter(m => m.type !== 'pair').length}</strong> {textByLang(lang, 'sets', '组面子')} + <strong>1</strong> {textByLang(lang, 'pair', '对将')}</span>
               )}
             </div>
             <div className="mj-stage-arrow">=</div>
-            <div className="mj-stage-pts">{hand.points}</div>
+            <div className="mj-stage-pts">{currentHandText.points}</div>
           </div>
         </div>
 
         {/* Winning hands summary grid */}
         <div className="mj-scoring">
-          <div className="mj-scoring-h">At a glance</div>
+          <div className="mj-scoring-h">{textByLang(lang, 'At a glance', '快速对照')}</div>
           <div className="mj-scoring-grid">
             {hands.map((h, i) => {
               const preview = h.id === 'thirteen'
@@ -895,10 +1023,10 @@ function SectionWin() {
                   className={`mj-score-row mj-score-row-hand${handIdx === i ? ' is-active' : ''}`}
                   onClick={() => setHandIdx(i)}
                 >
-                  <div className="mj-score-name">{h.name}<span className="mj-score-zh"> · {h.zh}</span></div>
+                  <div className="mj-score-name">{handText(h, variant, lang).name}<span className="mj-score-zh"> · {h.zh}</span></div>
                   <div className="mj-score-tiles">{preview.map((t, ti) => <Tile key={ti} id={t} size="xs" />)}</div>
-                  <div className="mj-score-desc">{h.desc}</div>
-                  <div className="mj-score-val">{h.points}</div>
+                  <div className="mj-score-desc">{handText(h, variant, lang).desc}</div>
+                  <div className="mj-score-val">{handText(h, variant, lang).points}</div>
                 </div>
               );
             })}
@@ -908,16 +1036,20 @@ function SectionWin() {
         {/* Scoring aside */}
         {variant === 'taiwan' ? (
           <div className="mj-scoring">
-            <div className="mj-scoring-h">Scoring bonuses · Taiwan</div>
+            <div className="mj-scoring-h">{textByLang(lang, 'Scoring bonuses · Taiwan', '计分加成 · 台湾')}</div>
             <div className="mj-scoring-fan">
-              <strong>臺</strong> (tái) = scoring unit. Each 臺 doubles your base payout — same exponential logic as fan, different name. Minimum <strong>1 臺</strong> to win; a hand with zero 臺 is an illegal win (烏龍) and earns a penalty. These bonuses stack on top of any winning hand.
+              {lang === 'zh' ? (
+                <><strong>台</strong> 是台湾麻将的计分单位。每多一台，基础输赢通常翻倍。一般至少 <strong>1 台</strong> 才能胡牌；没有台数却喊胡，属于诈胡或乌龙，会被罚分。</>
+              ) : (
+                <><strong>臺</strong> (tái) = scoring unit. Each 臺 doubles your base payout — same exponential logic as fan, different name. Minimum <strong>1 臺</strong> to win; a hand with zero 臺 is an illegal win (烏龍) and earns a penalty. These bonuses stack on top of any winning hand.</>
+              )}
             </div>
             <div className="mj-scoring-grid">
               {[
-                { name: 'Self-draw (自摸)', desc: 'You drew your own winning tile', val: '1 臺', tiles: ['wan-5'] },
-                { name: 'Pung of dragons', desc: 'Three of any dragon tile', val: '1 臺', tiles: ['red','red','red'] },
-                { name: 'Pung of seat/round wind', desc: 'Your wind, or the prevailing wind', val: '1 臺', tiles: ['east','east','east'] },
-                { name: 'Matching flower or season', desc: 'Flower/season number = your seat number', val: '1 臺 each', tiles: ['spring','mei'] },
+                { name: textByLang(lang, 'Self-draw (自摸)', '自摸'), desc: textByLang(lang, 'You drew your own winning tile', '自己摸到胡牌张'), val: textByLang(lang, '1 臺', '1 台'), tiles: ['wan-5'] },
+                { name: textByLang(lang, 'Pung of dragons', '箭刻'), desc: textByLang(lang, 'Three of any dragon tile', '中、发、白任意一种刻子'), val: textByLang(lang, '1 臺', '1 台'), tiles: ['red','red','red'] },
+                { name: textByLang(lang, 'Pung of seat/round wind', '门风 / 圈风刻'), desc: textByLang(lang, 'Your wind, or the prevailing wind', '自己的门风，或当前圈风刻子'), val: textByLang(lang, '1 臺', '1 台'), tiles: ['east','east','east'] },
+                { name: textByLang(lang, 'Matching flower or season', '正花 / 正季'), desc: textByLang(lang, 'Flower/season number = your seat number', '花季牌编号与座位对应'), val: textByLang(lang, '1 臺 each', '每张 1 台'), tiles: ['spring','mei'] },
               ].map((r, i) => (
                 <div key={i} className={`mj-score-row${r.limit ? ' mj-score-limit' : ''}`}>
                   <div className="mj-score-name">{r.name}</div>
@@ -928,21 +1060,25 @@ function SectionWin() {
               ))}
             </div>
             <div className="mj-scoring-note">
-              Self-draw (自摸): all three opponents pay you directly. On a discard win, only the discarder pays. Dealer pays or receives double.
+              {textByLang(lang, 'Self-draw (自摸): all three opponents pay you directly. On a discard win, only the discarder pays. Dealer pays or receives double.', '自摸时三家都要付；荣胡时通常由放铳者付。庄家输赢多有加倍处理。')}
             </div>
           </div>
         ) : variant === 'sichuan' ? (
           <div className="mj-scoring">
-            <div className="mj-scoring-h">Scoring bonuses · Sichuan</div>
+            <div className="mj-scoring-h">{textByLang(lang, 'Scoring bonuses · Sichuan', '计分加成 · 四川')}</div>
             <div className="mj-scoring-fan">
-              Sichuan tables still speak in <strong>fan</strong>, but exact values vary by house. The stable ideas: self-draw pays more, special hand shapes multiply, and kongs/roots add bonus value.
+              {lang === 'zh' ? (
+                <>四川麻将也常用 <strong>番</strong> 来表达倍率，但各地细则会不同。稳定的理解是：自摸更贵，特殊牌型加番，杠和根会带来额外收益。</>
+              ) : (
+                <>Sichuan tables still speak in <strong>fan</strong>, but exact values vary by house. The stable ideas: self-draw pays more, special hand shapes multiply, and kongs/roots add bonus value.</>
+              )}
             </div>
             <div className="mj-scoring-grid">
               {[
-                { name: 'Self-draw (自摸)', desc: 'You draw your own winning tile; usually all unfinished players pay', val: '+ fan', tiles: ['wan-5'] },
-                { name: 'All Pungs (碰碰胡)', desc: 'Four triplets plus a pair', val: '2+ fan', tiles: ['bing-7','bing-7','bing-7'] },
-                { name: 'Pure One Suit (清一色)', desc: 'All tiles from one suit', val: '4+ fan', tiles: ['tiao-3','tiao-4','tiao-5'] },
-                { name: 'Kong / Root (杠 / 根)', desc: 'Four copies of a tile, exposed or concealed, add bonus value', val: '+ bonus', tiles: ['wan-2','wan-2','wan-2','wan-2'] },
+                { name: textByLang(lang, 'Self-draw (自摸)', '自摸'), desc: textByLang(lang, 'You draw your own winning tile; usually all unfinished players pay', '自己摸到胡牌张，通常未胡的玩家都要付'), val: textByLang(lang, '+ fan', '加番'), tiles: ['wan-5'] },
+                { name: textByLang(lang, 'All Pungs (碰碰胡)', '碰碰胡'), desc: textByLang(lang, 'Four triplets plus a pair', '四组刻子加一对将'), val: textByLang(lang, '2+ fan', '2+ 番'), tiles: ['bing-7','bing-7','bing-7'] },
+                { name: textByLang(lang, 'Pure One Suit (清一色)', '清一色'), desc: textByLang(lang, 'All tiles from one suit', '整副手牌只用一门花色'), val: textByLang(lang, '4+ fan', '4+ 番'), tiles: ['tiao-3','tiao-4','tiao-5'] },
+                { name: textByLang(lang, 'Kong / Root (杠 / 根)', '杠 / 根'), desc: textByLang(lang, 'Four copies of a tile, exposed or concealed, add bonus value', '同一张牌四张齐全，明暗都可能产生额外收益'), val: textByLang(lang, '+ bonus', '加收'), tiles: ['wan-2','wan-2','wan-2','wan-2'] },
               ].map((r, i) => (
                 <div key={i} className={`mj-score-row${r.limit ? ' mj-score-limit' : ''}`}>
                   <div className="mj-score-name">{r.name}</div>
@@ -953,20 +1089,24 @@ function SectionWin() {
               ))}
             </div>
             <div className="mj-scoring-note">
-              The ruleset here models the common beginner-facing Sichuan pattern: 108 suited tiles, no chow claims, 定缺/缺一門, and 血戰到底 continuation.
+              {textByLang(lang, 'The ruleset here models the common beginner-facing Sichuan pattern: 108 suited tiles, no chow claims, 定缺/缺一門, and 血戰到底 continuation.', '这里采用适合初学者理解的四川麻将核心规则：108 张花色牌、不吃牌、定缺 / 缺一门，以及血战到底。')}
             </div>
           </div>
         ) : (
           <div className="mj-scoring">
-            <div className="mj-scoring-h">Scoring bonuses</div>
+            <div className="mj-scoring-h">{textByLang(lang, 'Scoring bonuses', '计分加成')}</div>
             <div className="mj-scoring-fan">
-              <strong>Fan</strong> (番 · fān) = scoring doubles. Every fan <em>doubles</em> your base points — so 3 fan = 2³ = 8× base, 6 fan = 64×. These bonuses stack on top of any winning hand.
+              {lang === 'zh' ? (
+                <><strong>番</strong> 是倍率单位。每多一番，基础分通常翻倍；例如 3 番约等于 2³，也就是 8 倍基础分。不同番种可以叠加。</>
+              ) : (
+                <><strong>Fan</strong> (番 · fān) = scoring doubles. Every fan <em>doubles</em> your base points — so 3 fan = 2³ = 8× base, 6 fan = 64×. These bonuses stack on top of any winning hand.</>
+              )}
             </div>
             <div className="mj-scoring-grid">
               {[
-                { name: 'Pung of dragons', desc: 'Three of any dragon tile', val: '1 fan', tiles: ['red','red','red'] },
-                { name: 'Pung of seat/round wind', desc: 'Your wind, or the prevailing wind', val: '1 fan', tiles: ['east','east','east'] },
-                { name: 'Self-drawn winning tile', desc: 'You drew your own winner', val: '+1 fan', tiles: ['wan-8'] },
+                { name: textByLang(lang, 'Pung of dragons', '箭刻'), desc: textByLang(lang, 'Three of any dragon tile', '中、发、白任意一种刻子'), val: textByLang(lang, '1 fan', '1 番'), tiles: ['red','red','red'] },
+                { name: textByLang(lang, 'Pung of seat/round wind', '门风 / 圈风刻'), desc: textByLang(lang, 'Your wind, or the prevailing wind', '自己的门风，或当前圈风刻子'), val: textByLang(lang, '1 fan', '1 番'), tiles: ['east','east','east'] },
+                { name: textByLang(lang, 'Self-drawn winning tile', '自摸'), desc: textByLang(lang, 'You drew your own winner', '自己摸到胡牌张'), val: textByLang(lang, '+1 fan', '+1 番'), tiles: ['wan-8'] },
               ].map((r, i) => (
                 <div key={i} className={`mj-score-row${r.limit ? ' mj-score-limit' : ''}`}>
                   <div className="mj-score-name">{r.name}</div>
@@ -977,7 +1117,7 @@ function SectionWin() {
               ))}
             </div>
             <div className="mj-scoring-note">
-              Final score ≈ base points × 2<sup>fan</sup>. More fan = exponentially more points. The loser(s) pay the winner; self-draw means everyone pays.
+              {lang === 'zh' ? <>最终分数大致是基础分 × 2<sup>番</sup>。番数越高，倍率增长越快；点炮通常由放铳者付，自摸则三家都付。</> : <>Final score ≈ base points × 2<sup>fan</sup>. More fan = exponentially more points. The loser(s) pay the winner; self-draw means everyone pays.</>}
             </div>
           </div>
         )}
@@ -991,6 +1131,7 @@ function SectionWin() {
 
 function SectionDraw() {
   const variant = React.useContext(VariantContext);
+  const lang = React.useContext(LanguageContext);
   const MAX_HAND = variant === 'taiwan' ? 17 : 14;
   const isSichuan = variant === 'sichuan';
 
@@ -1038,10 +1179,10 @@ function SectionDraw() {
   const total = d1 + d2;
   const SEATS = ['east', 'south', 'west', 'north'];
   const SEAT_META = {
-    east:  { zh: '東', en: 'East',  label: '東 E',  wallSide: 'right',  nums: [1, 5, 9] },
-    south: { zh: '南', en: 'South', label: '南 S',  wallSide: 'bottom', nums: [2, 6, 10] },
-    west:  { zh: '西', en: 'West',  label: '西 W',  wallSide: 'left',   nums: [3, 7, 11] },
-    north: { zh: '北', en: 'North', label: '北 N',  wallSide: 'top',    nums: [4, 8, 12] },
+    east:  { zh: '東', en: 'East', zhName: '东家',  label: '東 E',  wallSide: 'right',  nums: [1, 5, 9] },
+    south: { zh: '南', en: 'South', zhName: '南家', label: '南 S',  wallSide: 'bottom', nums: [2, 6, 10] },
+    west:  { zh: '西', en: 'West', zhName: '西家',  label: '西 W',  wallSide: 'left',   nums: [3, 7, 11] },
+    north: { zh: '北', en: 'North', zhName: '北家', label: '北 N',  wallSide: 'top',    nums: [4, 8, 12] },
   };
   const seatFor = (t) => SEATS[(t - 1) % 4];
   const breakSeat = seatFor(total);
@@ -1157,15 +1298,25 @@ function SectionDraw() {
   return (
     <section id="section-draw" className="mj-section" data-screen-label="04 Draw">
       <div className="mj-section-head">
-        <div className="mj-kicker">Section 03 · Opening the game</div>
-        <h2 className="mj-h2">How do you draw tiles?</h2>
+        <div className="mj-kicker">{textByLang(lang, 'Section 03 · Opening the game', '第 03 节 · 开局与摸牌')}</div>
+        <h2 className="mj-h2">{textByLang(lang, 'How do you draw tiles?', '怎么摸牌？')}</h2>
         <p className="mj-lede">
-          {variant === 'taiwan' ? (
-            <>Before the first turn, the 144 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Flowers and seasons are revealed and replaced whenever they appear.</>
-          ) : isSichuan ? (
-            <>Before the first turn, the 108 suited tiles become a shorter <strong>square wall</strong>. The opening feels familiar, but the wall is leaner because honors and bonus tiles are absent.</>
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <>开局前，144 张牌会码成一圈 <strong>方形牌墙</strong>。之后每个人都从牌墙里摸牌；花牌、季牌摸到就亮出并补牌。</>
+            ) : isSichuan ? (
+              <>开局前，108 张花色牌会码成一圈较短的 <strong>方形牌墙</strong>。流程和传统麻将相似，只是没有字牌与花季牌，牌墙更短。</>
+            ) : (
+              <>开局前，136 张牌会码成一圈 <strong>方形牌墙</strong>，之后随着摸牌逐步变短。下面用四步说明开局流程。</>
+            )
           ) : (
-            <>Before the first turn, the 136 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Here's the opening ritual — in four steps.</>
+            variant === 'taiwan' ? (
+              <>Before the first turn, the 144 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Flowers and seasons are revealed and replaced whenever they appear.</>
+            ) : isSichuan ? (
+              <>Before the first turn, the 108 suited tiles become a shorter <strong>square wall</strong>. The opening feels familiar, but the wall is leaner because honors and bonus tiles are absent.</>
+            ) : (
+              <>Before the first turn, the 136 tiles become a <strong>square wall</strong> that shrinks as players draw from it. Here's the opening ritual — in four steps.</>
+            )
           )}
         </p>
       </div>
@@ -1173,18 +1324,28 @@ function SectionDraw() {
       {/* Dealer selection callout */}
       <div className="mj-dealer-card">
         <div className="mj-dealer-item">
-          <div className="mj-dealer-item-h">Choosing the first dealer</div>
-          <p>Each player rolls two dice. The highest total takes the <strong>East seat</strong> and becomes the first dealer. Ties re-roll between the tied players.</p>
+          <div className="mj-dealer-item-h">{textByLang(lang, 'Choosing the first dealer', '决定第一局庄家')}</div>
+          <p>{lang === 'zh' ? <>每位玩家掷两颗骰子，点数最高者坐 <strong>东位</strong>，成为第一局庄家。若点数相同，由并列者重掷。</> : <>Each player rolls two dice. The highest total takes the <strong>East seat</strong> and becomes the first dealer. Ties re-roll between the tied players.</>}</p>
         </div>
         <div className="mj-dealer-divider" />
         <div className="mj-dealer-item">
-          <div className="mj-dealer-item-h">Dealer rotation</div>
-          {variant === 'taiwan' ? (
-            <p>Same as Hong Kong rules — the dealer keeps the East seat as long as they win. When any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong>. A drawn hand also keeps the dealer in place.</p>
-          ) : isSichuan ? (
-            <p>The dealer starts as East and play moves <strong>counter-clockwise</strong>. In 血戰到底 tables, the round can continue after a win, then the next hand rotates according to the table's dealer rule.</p>
+          <div className="mj-dealer-item-h">{textByLang(lang, 'Dealer rotation', '庄家轮转')}</div>
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <p>和港式类似：庄家连庄时继续坐东；若其他玩家胡牌，庄家按 <strong>逆时针</strong> 方向轮转。流局通常也保留庄家。</p>
+            ) : isSichuan ? (
+              <p>庄家从东位开始，行牌按 <strong>逆时针</strong> 方向进行。血战到底时，有人胡牌后本局仍可能继续，下一局庄家按桌上约定轮转。</p>
+            ) : (
+              <p>庄家胡牌则连庄；一旦其他玩家胡牌，庄家按 <strong>逆时针</strong> 方向轮转。流局（荒庄）通常庄家不变。</p>
+            )
           ) : (
-            <p>The dealer keeps the East seat for as long as they keep winning. The moment any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong> — South becomes East, West becomes South, and so on. A drawn hand (荒莊) also keeps the dealer in place.</p>
+            variant === 'taiwan' ? (
+              <p>Same as Hong Kong rules — the dealer keeps the East seat as long as they win. When any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong>. A drawn hand also keeps the dealer in place.</p>
+            ) : isSichuan ? (
+              <p>The dealer starts as East and play moves <strong>counter-clockwise</strong>. In 血戰到底 tables, the round can continue after a win, then the next hand rotates according to the table's dealer rule.</p>
+            ) : (
+              <p>The dealer keeps the East seat for as long as they keep winning. The moment any <em>other</em> player wins, the deal passes <strong>counter-clockwise</strong> — South becomes East, West becomes South, and so on. A drawn hand (荒莊) also keeps the dealer in place.</p>
+            )
           )}
         </div>
       </div>
@@ -1194,13 +1355,23 @@ function SectionDraw() {
         <div className="mj-draw-step">
           <div className="mj-draw-step-num">1</div>
           <div className="mj-draw-step-content">
-            <div className="mj-draw-step-title">Build the wall</div>
-            {variant === 'taiwan' ? (
-              <p>All 144 tiles are shuffled face-down and stacked two-high in a square. Each side is 18 stacks long — 18 × 2 × 4 = 144.</p>
-            ) : isSichuan ? (
-              <p>All 108 suited tiles are shuffled face-down and stacked two-high. A common layout uses 54 stacks total — two sides with 14 stacks and two sides with 13.</p>
+            <div className="mj-draw-step-title">{textByLang(lang, 'Build the wall', '码牌墙')}</div>
+            {lang === 'zh' ? (
+              variant === 'taiwan' ? (
+                <p>144 张牌全部洗混后背面朝上，码成两层高的方形牌墙。每边 18 墩：18 × 2 × 4 = 144。</p>
+              ) : isSichuan ? (
+                <p>108 张花色牌洗混后背面朝上，码成两层高的牌墙。常见做法是总共 54 墩，两边 14 墩、两边 13 墩。</p>
+              ) : (
+                <p>136 张牌全部洗混后背面朝上，码成两层高的方形牌墙。每边 17 墩：17 × 2 × 4 = 136。</p>
+              )
             ) : (
-              <p>All 136 tiles are shuffled face-down and stacked two-high in a square. Each side is 17 stacks long — 17 × 2 × 4 = 136.</p>
+              variant === 'taiwan' ? (
+                <p>All 144 tiles are shuffled face-down and stacked two-high in a square. Each side is 18 stacks long — 18 × 2 × 4 = 144.</p>
+              ) : isSichuan ? (
+                <p>All 108 suited tiles are shuffled face-down and stacked two-high. A common layout uses 54 stacks total — two sides with 14 stacks and two sides with 13.</p>
+              ) : (
+                <p>All 136 tiles are shuffled face-down and stacked two-high in a square. Each side is 17 stacks long — 17 × 2 × 4 = 136.</p>
+              )
             )}
           </div>
           <SmallWall step="build" />
@@ -1209,23 +1380,23 @@ function SectionDraw() {
         <div className="mj-draw-step">
           <div className="mj-draw-step-num">2</div>
           <div className="mj-draw-step-content">
-            <div className="mj-draw-step-title">Break the wall</div>
-            <p>The dealer rolls two dice. The <strong>total</strong> does two things at once — it picks whose wall to break, and how many stacks in from the right to break it.</p>
+            <div className="mj-draw-step-title">{textByLang(lang, 'Break the wall', '开门')}</div>
+            <p>{lang === 'zh' ? <>庄家掷两颗骰子。<strong>点数和</strong> 同时决定两件事：从哪一家的牌墙开门，以及从右往左数第几墩开门。</> : <>The dealer rolls two dice. The <strong>total</strong> does two things at once — it picks whose wall to break, and how many stacks in from the right to break it.</>}</p>
 
             <div className="mj-break-rules">
               <div className="mj-break-rule">
-                <div className="mj-break-rule-h">① Whose wall?</div>
-                <div className="mj-break-rule-p">Count the total <em>counter-clockwise</em> starting from the dealer (East = 1).</div>
+                <div className="mj-break-rule-h">{textByLang(lang, '① Whose wall?', '① 开哪家的墙？')}</div>
+                <div className="mj-break-rule-p">{lang === 'zh' ? <>从庄家东位开始，按 <em>逆时针</em> 数点数（东 = 1）。</> : <>Count the total <em>counter-clockwise</em> starting from the dealer (East = 1).</>}</div>
                 <div className="mj-break-map">
-                  <div className={`mj-break-map-row ${breakSeat==='east'?'is-on':''}`}><span className="mj-break-map-seat"><em>東</em> East</span><span className="mj-break-map-nums">1 · 5 · 9</span></div>
-                  <div className={`mj-break-map-row ${breakSeat==='south'?'is-on':''}`}><span className="mj-break-map-seat"><em>南</em> South</span><span className="mj-break-map-nums">2 · 6 · 10</span></div>
-                  <div className={`mj-break-map-row ${breakSeat==='west'?'is-on':''}`}><span className="mj-break-map-seat"><em>西</em> West</span><span className="mj-break-map-nums">3 · 7 · 11</span></div>
-                  <div className={`mj-break-map-row ${breakSeat==='north'?'is-on':''}`}><span className="mj-break-map-seat"><em>北</em> North</span><span className="mj-break-map-nums">4 · 8 · 12</span></div>
+                  <div className={`mj-break-map-row ${breakSeat==='east'?'is-on':''}`}><span className="mj-break-map-seat"><em>東</em> {textByLang(lang, 'East', '东家')}</span><span className="mj-break-map-nums">1 · 5 · 9</span></div>
+                  <div className={`mj-break-map-row ${breakSeat==='south'?'is-on':''}`}><span className="mj-break-map-seat"><em>南</em> {textByLang(lang, 'South', '南家')}</span><span className="mj-break-map-nums">2 · 6 · 10</span></div>
+                  <div className={`mj-break-map-row ${breakSeat==='west'?'is-on':''}`}><span className="mj-break-map-seat"><em>西</em> {textByLang(lang, 'West', '西家')}</span><span className="mj-break-map-nums">3 · 7 · 11</span></div>
+                  <div className={`mj-break-map-row ${breakSeat==='north'?'is-on':''}`}><span className="mj-break-map-seat"><em>北</em> {textByLang(lang, 'North', '北家')}</span><span className="mj-break-map-nums">4 · 8 · 12</span></div>
                 </div>
               </div>
               <div className="mj-break-rule">
-                <div className="mj-break-rule-h">② Where on it?</div>
-                <div className="mj-break-rule-p">On that player's wall, count the same total in stacks from the <em>right end</em>. That's your break point. Tiles to the left are the live wall; to the right, the dead wall (kongs &amp; replacements).</div>
+                <div className="mj-break-rule-h">{textByLang(lang, '② Where on it?', '② 从哪里开？')}</div>
+                <div className="mj-break-rule-p">{lang === 'zh' ? <>在那一家的牌墙上，从 <em>右端</em> 往左数同样的点数。数到的位置就是开门处；一侧是牌墙，另一侧留作岭上牌和补牌。</> : <>On that player's wall, count the same total in stacks from the <em>right end</em>. That's your break point. Tiles to the left are the live wall; to the right, the dead wall (kongs &amp; replacements).</>}</div>
               </div>
             </div>
 
@@ -1233,10 +1404,10 @@ function SectionDraw() {
               <button className="mj-dice-btn" onClick={rollDice} disabled={rolling}>
                 <DiceFace v={d1} /><DiceFace v={d2} />
                 <span className="mj-dice-total">= {total}</span>
-                <span className="mj-dice-reroll">{rolling ? 'rolling…' : '↻ roll'}</span>
+                <span className="mj-dice-reroll">{rolling ? textByLang(lang, 'rolling…', '掷骰中…') : textByLang(lang, '↻ roll', '↻ 掷骰')}</span>
               </button>
               <div className="mj-dice-explain">
-                → {total} lands on <strong>{SEAT_META[breakSeat].en}</strong> <em>({SEAT_META[breakSeat].zh})</em>. Break at stack <strong>{total}</strong> from the right.
+                {lang === 'zh' ? <>→ {total} 点落在 <strong>{SEAT_META[breakSeat].zhName}</strong> <em>({SEAT_META[breakSeat].zh})</em>。从右往左第 <strong>{total}</strong> 墩开门。</> : <>→ {total} lands on <strong>{SEAT_META[breakSeat].en}</strong> <em>({SEAT_META[breakSeat].zh})</em>. Break at stack <strong>{total}</strong> from the right.</>}
               </div>
             </div>
           </div>
@@ -1247,14 +1418,24 @@ function SectionDraw() {
           <div className="mj-draw-step-num">3</div>
           <div className="mj-draw-step-content">
             <div className="mj-draw-step-title">
-              {variant === 'taiwan' ? 'Deal 16 to each player' : 'Deal 13 to each player'}
+              {variant === 'taiwan' ? textByLang(lang, 'Deal 16 to each player', '每人发 16 张') : textByLang(lang, 'Deal 13 to each player', '每人发 13 张')}
             </div>
-            {variant === 'taiwan' ? (
-              <p>Four tiles at a time until everyone has 16. The dealer draws first to hold 17. Any <strong>flower or season tile</strong> drawn during the deal is immediately revealed, set aside, and replaced from the dead wall — this can chain if the replacement is also a bonus tile.</p>
-            ) : isSichuan ? (
-              <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order until everyone has 13 and the dealer has 14. Before meaningful discards begin, each player chooses a missing suit: 定缺.</p>
+            {lang === 'zh' ? (
+              variant === 'taiwan' ? (
+                <p>每次取四张，直到每人 16 张；庄家先多取一张，手里 17 张。发牌过程中若拿到 <strong>花牌或季牌</strong>，立即亮出、放在一旁，并从岭上补牌；若补到的还是花季牌，则继续补。</p>
+              ) : isSichuan ? (
+                <p>从庄家开始，按 <strong>逆时针</strong> 方向摸牌，直到每人 13 张、庄家 14 张。正式出牌前，每位玩家要先选择一门花色作为定缺。</p>
+              ) : (
+                <p>从庄家开始，按 <strong>逆时针</strong> 方向取牌（东 → 南 → 西 → 北）。先每次取四张到每人 12 张，再每人取一张；庄家最后多一张，共 14 张。</p>
+              )
             ) : (
-              <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order (East → South → West → North). Four tiles at a time until everyone has 12, then one more each. The dealer takes 14.</p>
+              variant === 'taiwan' ? (
+                <p>Four tiles at a time until everyone has 16. The dealer draws first to hold 17. Any <strong>flower or season tile</strong> drawn during the deal is immediately revealed, set aside, and replaced from the dead wall — this can chain if the replacement is also a bonus tile.</p>
+              ) : isSichuan ? (
+                <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order until everyone has 13 and the dealer has 14. Before meaningful discards begin, each player chooses a missing suit: 定缺.</p>
+              ) : (
+                <p>Starting with the dealer, players take tiles in <strong>counter-clockwise</strong> order (East → South → West → North). Four tiles at a time until everyone has 12, then one more each. The dealer takes 14.</p>
+              )
             )}
           </div>
           <SmallWall step="deal" showDirection />
@@ -1263,19 +1444,29 @@ function SectionDraw() {
         <div className="mj-draw-step">
           <div className="mj-draw-step-num">4</div>
           <div className="mj-draw-step-content">
-            <div className="mj-draw-step-title">Draw on your turn</div>
-            {variant === 'taiwan' ? (
-              <p>Click a stack in the wall to draw the next tile. You now have 17 — discard one to return to 16. If you draw a flower or season tile, reveal it, set it aside, and draw a replacement instead. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
-            ) : isSichuan ? (
-              <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13, usually pushing away tiles from your missing suit first. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+            <div className="mj-draw-step-title">{textByLang(lang, 'Draw on your turn', '轮到你时摸牌')}</div>
+            {lang === 'zh' ? (
+              variant === 'taiwan' ? (
+                <p>点击牌墙中的一墩摸下一张牌。摸后你有 17 张，需要打一张回到 16 张。若摸到花牌或季牌，亮出并从岭上补牌。行牌继续按 <strong>逆时针</strong> 方向进行。</p>
+              ) : isSichuan ? (
+                <p>点击牌墙中的一墩摸下一张牌。摸后你有 14 张，需要打一张回到 13 张；通常先把定缺那一门打干净。行牌继续按 <strong>逆时针</strong> 方向进行。</p>
+              ) : (
+                <p>点击牌墙中的一墩摸下一张牌。摸后你有 14 张，需要打一张回到 13 张。行牌继续按 <strong>逆时针</strong> 方向进行。</p>
+              )
             ) : (
-              <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+              variant === 'taiwan' ? (
+                <p>Click a stack in the wall to draw the next tile. You now have 17 — discard one to return to 16. If you draw a flower or season tile, reveal it, set it aside, and draw a replacement instead. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+              ) : isSichuan ? (
+                <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13, usually pushing away tiles from your missing suit first. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+              ) : (
+                <p>Click a stack in the wall to draw the next tile. You now have 14 — discard one to return to 13. Play continues <strong>counter-clockwise</strong> (E → S → W → N).</p>
+              )
             )}
             <div className="mj-draw-controls">
               <button className="mj-btn mj-btn-primary" onClick={doDraw} disabled={drawing || handFull}>
-                {hand.length === 0 ? 'Start drawing' : !handFull ? `Draw tile ${hand.length + 1}` : 'Hand full'}
+                {hand.length === 0 ? textByLang(lang, 'Start drawing', '开始摸牌') : !handFull ? textByLang(lang, `Draw tile ${hand.length + 1}`, `摸第 ${hand.length + 1} 张`) : textByLang(lang, 'Hand full', '手牌已满')}
               </button>
-              <button className="mj-btn" onClick={resetHand}>Reset</button>
+              <button className="mj-btn" onClick={resetHand}>{textByLang(lang, 'Reset', '重置')}</button>
             </div>
           </div>
           <div className={`mj-wall-mini variant-interactive`}>
@@ -1312,8 +1503,8 @@ function SectionDraw() {
       {/* Your hand */}
       <div className="mj-your-hand">
         <div className="mj-hand-label">
-          Your hand · <span className="mj-hand-count">{hand.length} / {MAX_HAND}</span>
-          {handFull && <span className="mj-hand-discard-hint"> — tap a tile to discard</span>}
+          {textByLang(lang, 'Your hand', '你的手牌')} · <span className="mj-hand-count">{hand.length} / {MAX_HAND}</span>
+          {handFull && <span className="mj-hand-discard-hint"> — {textByLang(lang, 'tap a tile to discard', '轻点一张牌打出')}</span>}
         </div>
         <div className={`mj-hand-row ${handFull ? 'is-discard-mode' : ''}`}>
           {hand.map((t, i) => (
@@ -1327,20 +1518,20 @@ function SectionDraw() {
             </div>
           ))}
           {hand.length === 0 && (
-            <div className="mj-hand-empty">Click a stack in the wall (step 4) to draw a tile →</div>
+            <div className="mj-hand-empty">{textByLang(lang, 'Click a stack in the wall (step 4) to draw a tile →', '点击第 4 步里的牌墙摸一张牌 →')}</div>
           )}
         </div>
       </div>
 
       {/* Simple list — re-done as per user request */}
       <ul className="mj-draw-list">
-        <li><strong>Draw order.</strong> Counter-clockwise. East (the dealer) always starts.</li>
-        {isSichuan && <li><strong>Ding Que.</strong> Choose one suit to abandon. You cannot win until that suit is gone from your hand.</li>}
-        <li><strong>Dead wall.</strong> The last tiles are reserved for kongs and replacements.</li>
-        <li><strong>Kong replacement.</strong> Declare a kong → draw one extra tile from the dead wall's end.</li>
-        {variant === 'taiwan' && <li><strong>Flower replacement.</strong> Draw a flower or season tile → reveal it, set it aside face-up, and draw a replacement from the dead wall. Happens during the deal and on any subsequent draw.</li>}
-        {isSichuan && <li><strong>Bloody battle.</strong> A win does not necessarily end the hand; unfinished players keep playing under 血戰到底 rules.</li>}
-        <li><strong>Exhausted wall.</strong> If the live wall runs out with no winner, it's a draw (黃莊 · huáng zhuāng).</li>
+        <li><strong>{textByLang(lang, 'Draw order.', '摸牌顺序。')}</strong> {textByLang(lang, 'Counter-clockwise. East (the dealer) always starts.', '逆时针进行，永远由东家（庄家）先开始。')}</li>
+        {isSichuan && <li><strong>{textByLang(lang, 'Ding Que.', '定缺。')}</strong> {textByLang(lang, 'Choose one suit to abandon. You cannot win until that suit is gone from your hand.', '选择一门要打缺的花色。手里还有这门牌时不能胡。')}</li>}
+        <li><strong>{textByLang(lang, 'Dead wall.', '岭上牌。')}</strong> {textByLang(lang, 'The last tiles are reserved for kongs and replacements.', '牌墙末端留作杠牌和补牌。')}</li>
+        <li><strong>{textByLang(lang, 'Kong replacement.', '杠后补牌。')}</strong> {textByLang(lang, "Declare a kong → draw one extra tile from the dead wall's end.", '开杠后，从岭上牌补摸一张。')}</li>
+        {variant === 'taiwan' && <li><strong>{textByLang(lang, 'Flower replacement.', '花季补牌。')}</strong> {textByLang(lang, 'Draw a flower or season tile → reveal it, set it aside face-up, and draw a replacement from the dead wall. Happens during the deal and on any subsequent draw.', '摸到花牌或季牌时，亮出放在一旁，并从岭上补牌；发牌和之后摸牌都一样处理。')}</li>}
+        {isSichuan && <li><strong>{textByLang(lang, 'Bloody battle.', '血战到底。')}</strong> {textByLang(lang, 'A win does not necessarily end the hand; unfinished players keep playing under 血戰到底 rules.', '有人胡牌并不一定结束本局，未胡玩家继续打到三家胡牌或牌墙摸完。')}</li>}
+        <li><strong>{textByLang(lang, 'Exhausted wall.', '牌墙摸完。')}</strong> {textByLang(lang, "If the live wall runs out with no winner, it's a draw (黃莊 · huáng zhuāng).", '若牌墙摸完仍无人胡牌，则流局，也叫荒庄。')}</li>
       </ul>
     </section>
   );
@@ -1607,8 +1798,97 @@ const SET_EXAMPLES_SICHUAN = [
   },
 ];
 
+const ACTION_TEXT_ZH = {
+  draw: { name: '摸牌', lit: '摸一张牌', timing: '你的回合', when: '回合开始时', desc: '从牌墙摸一张牌，此时手里多一张；随后必须打一张，回到正常手牌数。' },
+  discard: { name: '打牌', lit: '打出一张牌', timing: '你的回合', when: '回合结束时', desc: '把一张牌明着打出，手牌回到正常张数。四川麻将通常优先打掉定缺那一门。' },
+  pung: { name: '碰', lit: '碰成刻子', timing: '他人回合', when: '任何玩家打出时', desc: '别人打出的牌若能和你手里的两张相同牌组成刻子，可以碰。四川麻将不能吃牌，碰是主要的副露方式。' },
+  chow: { name: '吃', lit: '吃成顺子', timing: '他人回合', when: '只能吃上家的牌', desc: '用刚打出的牌和自己手里的两张牌组成同花色顺子；只能吃上家。' },
+  kong: { name: '杠', lit: '四张相同', timing: '都可以', when: '可明杠，也可暗杠', desc: '四张相同牌组成杠。杠后要从岭上补摸一张。' },
+  hu: { name: '胡牌', lit: '完成牌型', timing: '都可以', when: '牌型完成时', desc: '宣布胡牌。若多家争同一张牌，胡牌优先级最高。四川麻将还要满足缺一门。' },
+  dingque: { name: '定缺', lit: '确定缺门', timing: '你的回合', when: '第一次出牌前', desc: '选择一门必须打缺的花色。胡牌前，手里不能再有这门牌。' },
+  flower: { name: '补花 / 补季', lit: '亮出并补牌', timing: '你的回合', when: '摸到花季牌时立即处理', desc: '摸到花牌或季牌后，亮出放在一旁，再从岭上补一张；它不进入手牌。' },
+};
+
+const SET_EXAMPLE_TEXT_ZH = {
+  default: [
+    {
+      kind: '顺子 (chī) · 吃',
+      desc: '同一花色连续三张。',
+      valid: ['万子 4-5-6，标准顺子', '条子最低顺 1-2-3', '筒子 7-8-9，包含九这张端张'],
+      invalid: ['混了不同花色，不能算顺子', '数字不连续', '字牌永远不能组成顺子'],
+    },
+    {
+      kind: '刻子 (pèng) · 碰',
+      desc: '三张完全相同的牌。',
+      valid: ['三张五万', '三张东风', '三张红中，通常有番'],
+      invalid: ['只有两张相同，另加一张不同牌', '同数字但不同花色，不算相同', '两张东风不是刻子'],
+    },
+    {
+      kind: '杠 (gàng) · 杠',
+      desc: '四张完全相同的牌。开杠后要补牌。',
+      valid: ['四张四条', '四张白板暗杠'],
+      invalid: ['其中一张不同', '只有三张，这是刻子不是杠'],
+    },
+    {
+      kind: '对子 · 将 / 眼',
+      desc: '两张完全相同的牌。常规胡牌需要一对将。',
+      valid: ['一对发财', '任意两张相同牌都可以作将'],
+      invalid: ['两张不同，不能作将', '不同风牌，不能作将'],
+    },
+  ],
+  sichuan: [
+    {
+      kind: '刻子 (pèng) · 碰',
+      desc: '三张完全相同的花色牌。四川麻将不能吃，碰是主要的副露方式。',
+      valid: ['三张五万', '三张八条', '三张二筒'],
+      invalid: ['只有两张相同，另加一张不同牌', '同数字但不同花色，不算相同', '只有两张，这是对子不是刻子'],
+    },
+    {
+      kind: '杠 (gàng) · 杠',
+      desc: '四张完全相同的花色牌。杠和根通常会带来额外收益。',
+      valid: ['四张四条', '九万成根 / 成杠'],
+      invalid: ['其中一张不同', '只有三张，这是刻子不是杠'],
+    },
+    {
+      kind: '对子 · 将 / 眼',
+      desc: '两张完全相同的牌。常规胡牌仍然需要一对将。',
+      valid: ['任意两张相同花色牌', '一对一条'],
+      invalid: ['两张不同，不能作将', '同数字但不同花色，也不是对子'],
+    },
+    {
+      kind: '缺一门 · 定缺',
+      desc: '定缺之后，胡牌时不能再有你选择打缺的那一门。',
+      valid: ['没有条子，满足缺条', '没有万子，满足缺万'],
+      invalid: ['三门花色都还在', '如果定缺为条，手里仍有条子就不能胡'],
+    },
+  ],
+};
+
+function actionText(action, lang) {
+  if (lang !== 'zh') return {
+    name: action.name,
+    lit: action.en,
+    timing: action.timing === 'on-turn' ? 'Your turn' : action.timing === 'out-of-turn' ? 'Out of turn' : 'Either',
+    when: action.when,
+    desc: action.desc,
+  };
+  return ACTION_TEXT_ZH[action.id] || {
+    name: action.name,
+    lit: action.en,
+    timing: action.timing,
+    when: action.when,
+    desc: action.desc,
+  };
+}
+
+function setExampleText(ex, idx, variant, lang) {
+  if (lang !== 'zh') return ex;
+  return SET_EXAMPLE_TEXT_ZH[variant === 'sichuan' ? 'sichuan' : 'default']?.[idx] || ex;
+}
+
 function SectionActions() {
   const variant = React.useContext(VariantContext);
+  const lang = React.useContext(LanguageContext);
   const actions = variant === 'sichuan'
     ? SICHUAN_ACTIONS
     : [
@@ -1627,26 +1907,45 @@ function SectionActions() {
       }] : []),
     ];
   const priorityRows = variant === 'sichuan'
-    ? [
-      { rank: '1', name: 'Hu (win)', desc: 'Highest priority. A complete hand can win from draw or discard once 缺一門 is satisfied.' },
-      { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat. Chow is not a legal claim in Sichuan.' },
-    ]
-    : [
-      { rank: '1', name: 'Hu (win)', desc: 'Always wins — if the discarded tile completes your hand, you win immediately.' },
-      { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat — beats chow.' },
-      { rank: '3', name: 'Chow', desc: 'Only the next player (to the discarder\'s right).' },
-    ];
+    ? lang === 'zh'
+      ? [
+        { rank: '1', name: '胡牌', desc: '优先级最高。只要牌型完成且满足缺一门，可以自摸胡，也可以胡别人打出的牌。' },
+        { rank: '2', name: '碰 / 杠', desc: '任何座位都可以碰杠。四川麻将不能吃牌。' },
+      ]
+      : [
+        { rank: '1', name: 'Hu (win)', desc: 'Highest priority. A complete hand can win from draw or discard once 缺一門 is satisfied.' },
+        { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat. Chow is not a legal claim in Sichuan.' },
+      ]
+    : lang === 'zh'
+      ? [
+        { rank: '1', name: '胡牌', desc: '最高优先级。若别人打出的牌正好让你胡牌，可以立即胡。' },
+        { rank: '2', name: '碰 / 杠', desc: '任何座位都可以碰或杠，优先级高于吃。' },
+        { rank: '3', name: '吃', desc: '只能吃上家刚打出的牌。' },
+      ]
+      : [
+        { rank: '1', name: 'Hu (win)', desc: 'Always wins — if the discarded tile completes your hand, you win immediately.' },
+        { rank: '2', name: 'Pung / Kong', desc: 'Anyone, any seat — beats chow.' },
+        { rank: '3', name: 'Chow', desc: 'Only the next player (to the discarder\'s right).' },
+      ];
 
   return (
     <section id="section-actions" className="mj-section" data-screen-label="04 Actions">
       <div className="mj-section-head">
-        <div className="mj-kicker">Section 04 · Your turn</div>
-        <h2 className="mj-h2">What can you do each turn?</h2>
+        <div className="mj-kicker">{textByLang(lang, 'Section 04 · Your turn', '第 04 节 · 轮到你时')}</div>
+        <h2 className="mj-h2">{textByLang(lang, 'What can you do each turn?', '每回合可以做什么？')}</h2>
         <p className="mj-lede">
-          {variant === 'sichuan' ? (
-            <>Your basic move is still draw one, discard one — you keep exactly <strong>13 tiles</strong> in hand. The Sichuan twist is <em>定缺</em>: pick one suit to empty, and remember that <strong>chow is not a legal discard claim</strong>.</>
+          {lang === 'zh' ? (
+            variant === 'sichuan' ? (
+              <>基本动作仍然是摸一张、打一张，平时手里保持 <strong>13 张</strong>。四川麻将的关键是<em>定缺</em>：先选一门要打缺的花色，并且记住 <strong>四川麻将不能吃牌</strong>。</>
+            ) : (
+              <>基本动作是摸一张、打一张，平时手里保持 <strong>{variant === 'taiwan' ? '16' : '13'} 张</strong>。别人打牌时，你可以打断流程来碰牌；吃牌则只能吃上家。</>
+            )
           ) : (
-            <>Your basic move is to draw one tile then discard one — you always keep exactly <strong>{variant === 'taiwan' ? '16' : '13'} tiles</strong> in hand. Between turns you can <em>interrupt</em> to claim a discard from any player (pung) or just from the player before you (chow).</>
+            variant === 'sichuan' ? (
+              <>Your basic move is still draw one, discard one — you keep exactly <strong>13 tiles</strong> in hand. The Sichuan twist is <em>定缺</em>: pick one suit to empty, and remember that <strong>chow is not a legal discard claim</strong>.</>
+            ) : (
+              <>Your basic move is to draw one tile then discard one — you always keep exactly <strong>{variant === 'taiwan' ? '16' : '13'} tiles</strong> in hand. Between turns you can <em>interrupt</em> to claim a discard from any player (pung) or just from the player before you (chow).</>
+            )
           )}
         </p>
       </div>
@@ -1658,20 +1957,20 @@ function SectionActions() {
             <div className="mj-action-zh-col">
               <div className="mj-action-zh">{a.zh}</div>
               <div className="mj-action-pinyin">{a.pinyin}</div>
-              <div className="mj-action-lit">{a.en}</div>
+              <div className="mj-action-lit">{actionText(a, lang).lit}</div>
             </div>
             <div className="mj-action-main">
-              <div className="mj-action-name">{a.name}</div>
-              <div className="mj-action-desc">{a.desc}</div>
+              <div className="mj-action-name">{actionText(a, lang).name}</div>
+              <div className="mj-action-desc">{actionText(a, lang).desc}</div>
             </div>
             <div className="mj-action-example">
               {a.example.map((t, i) => <Tile key={i} id={t} size="sm" />)}
             </div>
             <div className="mj-action-when-col">
               <span className={`mj-action-timing mj-timing-${a.timing}`}>
-                {a.timing === 'on-turn' ? 'Your turn' : a.timing === 'out-of-turn' ? 'Out of turn' : 'Either'}
+                {actionText(a, lang).timing}
               </span>
-              <span className="mj-action-when-txt">{a.when}</span>
+              <span className="mj-action-when-txt">{actionText(a, lang).when}</span>
             </div>
           </div>
         ))}
@@ -1679,7 +1978,7 @@ function SectionActions() {
 
       {/* Priority explainer */}
       <div className="mj-priority">
-        <div className="mj-priority-h">What if two players want the same discard?</div>
+        <div className="mj-priority-h">{textByLang(lang, 'What if two players want the same discard?', '两个人都要同一张牌怎么办？')}</div>
         <div className="mj-priority-ladder">
           {priorityRows.map((row) => (
             <div key={row.rank} className="mj-prio-row">
@@ -1693,24 +1992,29 @@ function SectionActions() {
 
       {/* Valid vs invalid — tabbed, single block */}
       <div className="mj-vi-head">
-        <h3 className="mj-h3">Valid vs. invalid sets</h3>
+        <h3 className="mj-h3">{textByLang(lang, 'Valid vs. invalid sets', '哪些牌组有效？')}</h3>
         <p className="mj-vi-sub">
-          {variant === 'sichuan'
-            ? 'Sichuan removes chow as a claim action. Runs can still appear in many table rules; the extra test is whether your chosen missing suit is gone.'
-            : "A set is the building block of a winning hand. Here's what counts — and what doesn't."}
+          {lang === 'zh'
+            ? variant === 'sichuan'
+              ? '四川麻将不能把吃作为副露动作；很多桌规里手牌仍可含顺子，真正额外要检查的是定缺那一门是否已经打干净。'
+              : '面子和对子是胡牌的基本积木。下面对比哪些算数，哪些不算。'
+            : variant === 'sichuan'
+              ? 'Sichuan removes chow as a claim action. Runs can still appear in many table rules; the extra test is whether your chosen missing suit is gone.'
+              : "A set is the building block of a winning hand. Here's what counts — and what doesn't."}
         </p>
       </div>
 
-      <ValidInvalidTabs variant={variant} />
+      <ValidInvalidTabs variant={variant} lang={lang} />
     </section>
   );
 }
 
-function ValidInvalidTabs({ variant }) {
+function ValidInvalidTabs({ variant, lang }) {
   const examples = variant === 'sichuan' ? SET_EXAMPLES_SICHUAN : SET_EXAMPLES;
   const [idx, setIdx] = React.useState(0);
   React.useEffect(() => { setIdx(0); }, [variant]);
   const ex = examples[idx];
+  const exText = setExampleText(ex, idx, variant, lang);
   return (
     <div className="mj-vi-block">
       <div className="mj-vi-tabs">
@@ -1719,36 +2023,36 @@ function ValidInvalidTabs({ variant }) {
             key={i}
             className={`mj-vi-tab ${idx === i ? 'is-active' : ''}`}
             onClick={() => setIdx(i)}
-          >{e.kind}</button>
+          >{setExampleText(e, i, variant, lang).kind}</button>
         ))}
       </div>
-      <div className="mj-vi-desc mj-vi-block-desc">{ex.desc}</div>
+      <div className="mj-vi-desc mj-vi-block-desc">{exText.desc}</div>
       <div className="mj-vi-cols">
         <div className="mj-vi-col mj-vi-valid">
           <div className="mj-vi-col-head">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M2 7l3.5 3.5L12 4"/></svg>
-            Valid
+            {textByLang(lang, 'Valid', '有效')}
           </div>
           {ex.valid.map((v, vi) => (
             <div key={vi} className="mj-vi-example">
               <div className="mj-vi-tiles">
                 {v.tiles.map((t, ti) => <Tile key={ti} id={t} size="sm" />)}
               </div>
-              <div className="mj-vi-note">{v.note}</div>
+              <div className="mj-vi-note">{lang === 'zh' ? exText.valid?.[vi] : v.note}</div>
             </div>
           ))}
         </div>
         <div className="mj-vi-col mj-vi-invalid">
           <div className="mj-vi-col-head">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>
-            Not valid
+            {textByLang(lang, 'Not valid', '无效')}
           </div>
           {ex.invalid.map((v, vi) => (
             <div key={vi} className="mj-vi-example">
               <div className="mj-vi-tiles">
                 {v.tiles.map((t, ti) => <Tile key={ti} id={t} size="sm" />)}
               </div>
-              <div className="mj-vi-note">{v.note}</div>
+              <div className="mj-vi-note">{lang === 'zh' ? exText.invalid?.[vi] : v.note}</div>
             </div>
           ))}
         </div>
@@ -1762,18 +2066,24 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "showThemePicker": true
 }/*EDITMODE-END*/;
 
-const VariantContext = React.createContext('hk');
+const VariantContext = React.createContext('sichuan');
+const LanguageContext = React.createContext('en');
 
 const SECTIONS = [
-  { id: 'section-tiles', num: '01', label: 'What are the tiles?' },
-  { id: 'section-win', num: '02', label: 'How do you win?' },
-  { id: 'section-draw', num: '03', label: 'How do you draw tiles?' },
-  { id: 'section-actions', num: '04', label: 'Valid moves on a turn' },
+  { id: 'section-tiles', num: '01', label: 'What are the tiles?', labelZh: '麻将有哪些牌？' },
+  { id: 'section-win', num: '02', label: 'How do you win?', labelZh: '怎样算胡牌？' },
+  { id: 'section-draw', num: '03', label: 'How do you draw tiles?', labelZh: '怎么摸牌？' },
+  { id: 'section-actions', num: '04', label: 'Valid moves on a turn', labelZh: '每回合可做什么？' },
 ];
+
+function sectionLabel(section, lang) {
+  return lang === 'zh' ? section.labelZh : section.label;
+}
 
 function App() {
   const [theme, setTheme] = React.useState(TWEAK_DEFAULTS.theme);
-  const [variant, setVariant] = React.useState('hk');
+  const [variant, setVariant] = React.useState('sichuan');
+  const [lang, setLang] = React.useState('en');
   const [active, setActive] = React.useState('section-tiles');
   const [tweaksOn, setTweaksOn] = React.useState(false);
 
@@ -1781,6 +2091,10 @@ function App() {
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+  }, [lang]);
 
   // Tweaks host protocol
   React.useEffect(() => {
@@ -1796,6 +2110,10 @@ function App() {
   const setTheme2 = (t) => {
     setTheme(t);
     window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { theme: t } }, '*');
+  };
+
+  const setLang2 = (nextLang) => {
+    setLang(nextLang);
   };
 
   // Scroll spy
@@ -1822,141 +2140,146 @@ function App() {
 
   return (
     <VariantContext.Provider value={variant}>
-      <aside className="mj-sidenav">
-        <div className="mj-brand">
-          <img src="tiles/modal-tile.svg" className="mj-brand-logo" alt="" />
-          Mahjong <span className="mj-brand-zh">麻將</span>
-        </div>
-        <nav className="mj-nav">
-          {SECTIONS.map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              className={active === s.id ? 'is-active' : ''}
-              onClick={(e) => { e.preventDefault(); go(s.id); }}
-            >
-              <span className="mj-nav-num">{s.num}</span>
-              <span className="mj-nav-label">{s.label}</span>
-            </a>
-          ))}
-        </nav>
-        <div className="mj-theme-picker">
-          <div className="mj-theme-label">Theme</div>
-          {[
-            { id: 'jade', label: 'Jade' },
-            { id: 'lacquer', label: 'Lacquer' },
-            { id: 'study', label: 'Study' },
-          ].map((t) => (
-            <button
-              key={t.id}
-              className={`mj-theme-btn ${theme === t.id ? 'is-active' : ''}`}
-              onClick={() => setTheme2(t.id)}
-            >{t.label}</button>
-          ))}
-        </div>
-        <div className="mj-theme-picker">
-          <div className="mj-theme-label">Ruleset</div>
-          {RULESETS.map((v) => (
-            <button
-              key={v.id}
-              className={`mj-theme-btn ${variant === v.id ? 'is-active' : ''}`}
-              onClick={() => setVariant(v.id)}
-            >{v.shortLabel}</button>
-          ))}
-        </div>
-      </aside>
-
-      {/* Mobile collapsible topbar */}
-      <MobileTopbar active={active} go={go} />
-
-      <div className="mj-main">
-        <Hero theme={theme} setTheme2={setTheme2} setVariant={setVariant} />
-        <div className="mj-theme-bar">
-          <span className="mj-theme-bar-label">Ruleset</span>
-          <div className="mj-theme-bar-btns">
+      <LanguageContext.Provider value={lang}>
+        <aside className="mj-sidenav">
+          <div className="mj-brand">
+            <img src="tiles/modal-tile.svg" className="mj-brand-logo" alt="" />
+            Mahjong <span className="mj-brand-zh">麻將</span>
+          </div>
+          <nav className="mj-nav">
+            {SECTIONS.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className={active === s.id ? 'is-active' : ''}
+                onClick={(e) => { e.preventDefault(); go(s.id); }}
+              >
+                <span className="mj-nav-num">{s.num}</span>
+                <span className="mj-nav-label">{sectionLabel(s, lang)}</span>
+              </a>
+            ))}
+          </nav>
+          <div className="mj-theme-picker">
+            <div className="mj-theme-label">{textByLang(lang, 'Theme', '主题')}</div>
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                className={`mj-theme-btn ${theme === t.id ? 'is-active' : ''}`}
+                onClick={() => setTheme2(t.id)}
+              >{themeLabel(t, lang)}</button>
+            ))}
+          </div>
+          <div className="mj-theme-picker">
+            <div className="mj-theme-label">{textByLang(lang, 'Ruleset', '规则')}</div>
             {RULESETS.map((v) => (
               <button
                 key={v.id}
-                className={`mj-theme-bar-btn ${variant === v.id ? 'is-active' : ''}`}
+                className={`mj-theme-btn ${variant === v.id ? 'is-active' : ''}`}
                 onClick={() => setVariant(v.id)}
-              >{v.shortLabel}</button>
+              >{rulesetLabel(v, lang, true)}</button>
             ))}
           </div>
-        </div>
-        <div className="mj-theme-bar">
-          <span className="mj-theme-bar-label">Color theme</span>
-          <div className="mj-theme-bar-btns">
-            {[
-              { id: 'jade', label: 'Jade' },
-              { id: 'lacquer', label: 'Lacquer' },
-              { id: 'study', label: 'Study' },
-            ].map((t) => (
+          <div className="mj-theme-picker">
+            <div className="mj-theme-label">{textByLang(lang, 'Language', '语言')}</div>
+            {LANG_OPTIONS.map((option) => (
               <button
-                key={t.id}
-                className={`mj-theme-bar-btn ${theme === t.id ? 'is-active' : ''}`}
-                onClick={() => setTheme2(t.id)}
-              >{t.label}</button>
+                key={option.id}
+                className={`mj-theme-btn ${lang === option.id ? 'is-active' : ''}`}
+                onClick={() => setLang2(option.id)}
+              >{option.label}</button>
             ))}
           </div>
-        </div>
-        <SectionTiles />
-        <SectionWin />
-        <SectionDraw />
-        <SectionActions />
-      </div>
+        </aside>
 
-      <footer className="mj-foot">
-        <div className="mj-foot-brand">Mahjong <em>麻將</em></div>
-        <div className="mj-foot-note">
-          A visual guide for total beginners.
-          <div className="mj-foot-credit">
-            Mahjong tile SVGs adapted from <a href="https://commons.wikimedia.org/wiki/Category:SVG_Planar_illustrations_of_Mahjong_tiles" target="_blank" rel="noopener noreferrer">Shizhao</a> (derivative work by shizhao), Public domain, via Wikimedia Commons — with minor design edits.
+        {/* Mobile collapsible topbar */}
+        <MobileTopbar active={active} go={go} />
+
+        <div className="mj-main">
+          <Hero theme={theme} setTheme2={setTheme2} setVariant={setVariant} lang={lang} setLang={setLang2} />
+          <div className="mj-theme-bar">
+            <span className="mj-theme-bar-label">{textByLang(lang, 'Ruleset', '规则')}</span>
+            <div className="mj-theme-bar-btns">
+              {RULESETS.map((v) => (
+                <button
+                  key={v.id}
+                  className={`mj-theme-bar-btn ${variant === v.id ? 'is-active' : ''}`}
+                  onClick={() => setVariant(v.id)}
+                >{rulesetLabel(v, lang, true)}</button>
+              ))}
+            </div>
           </div>
-        </div>
-        <a className="mj-foot-cta" href={BLOG_URL} target="_blank" rel="noopener noreferrer">
-          <span className="mj-foot-cta-tile">
-            <img src="tiles/modal-tile.svg" alt="" />
-          </span>
-          <span className="mj-foot-cta-text">
-            <span className="mj-foot-cta-kicker">You're invited</span>
-            <span className="mj-foot-cta-title">Visit Haerin's Blog</span>
-          </span>
-          <span className="mj-foot-cta-arrow">→</span>
-        </a>
-      </footer>
-
-      <ToastInvite />
-
-      {tweaksOn && (
-        <div style={{
-          position: 'fixed', bottom: 20, right: 20, zIndex: 100,
-          background: 'var(--paper)', border: '1px solid var(--rule)',
-          padding: 16, borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-          fontFamily: 'var(--sans)', minWidth: 200,
-        }}>
-          <div style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: 'var(--ink-muted)', marginBottom: 10, fontWeight: 600 }}>Tweaks</div>
-          <div style={{ fontSize: 13, marginBottom: 8, color: 'var(--ink-soft)' }}>Color theme</div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            {['jade', 'lacquer', 'study'].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTheme2(t)}
-                style={{
-                  flex: 1, padding: '8px 10px', fontSize: 12, cursor: 'pointer',
-                  border: '1px solid ' + (theme === t ? 'var(--jade)' : 'var(--rule)'),
-                  background: theme === t ? 'var(--jade-wash)' : 'var(--paper)',
-                  color: 'var(--ink)', borderRadius: 5, fontFamily: 'inherit', textTransform: 'capitalize',
-                }}
-              >{t}</button>
-            ))}
+          <div className="mj-theme-bar">
+            <span className="mj-theme-bar-label">{textByLang(lang, 'Color theme', '颜色主题')}</span>
+            <div className="mj-theme-bar-btns">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`mj-theme-bar-btn ${theme === t.id ? 'is-active' : ''}`}
+                  onClick={() => setTheme2(t.id)}
+                >{themeLabel(t, lang)}</button>
+              ))}
+            </div>
           </div>
+          <SectionTiles />
+          <SectionWin />
+          <SectionDraw />
+          <SectionActions />
         </div>
-      )}
+
+        <footer className="mj-foot">
+          <div className="mj-foot-brand">Mahjong <em>麻將</em></div>
+          <div className="mj-foot-note">
+            {textByLang(lang, 'A visual guide for total beginners.', '为零基础玩家准备的可视化麻将入门指南。')}
+            <div className="mj-foot-credit">
+              {lang === 'zh' ? <>麻将牌 SVG 改编自 <a href="https://commons.wikimedia.org/wiki/Category:SVG_Planar_illustrations_of_Mahjong_tiles" target="_blank" rel="noopener noreferrer">Shizhao</a>（Public domain，Wikimedia Commons），并做了少量视觉调整。</> : <>Mahjong tile SVGs adapted from <a href="https://commons.wikimedia.org/wiki/Category:SVG_Planar_illustrations_of_Mahjong_tiles" target="_blank" rel="noopener noreferrer">Shizhao</a> (derivative work by shizhao), Public domain, via Wikimedia Commons — with minor design edits.</>}
+            </div>
+          </div>
+          <a className="mj-foot-cta" href={BLOG_URL} target="_blank" rel="noopener noreferrer">
+            <span className="mj-foot-cta-tile">
+              <img src="tiles/modal-tile.svg" alt="" />
+            </span>
+            <span className="mj-foot-cta-text">
+              <span className="mj-foot-cta-kicker">{textByLang(lang, "You're invited", '欢迎访问')}</span>
+              <span className="mj-foot-cta-title">{textByLang(lang, "Visit Haerin's Blog", '访问 Haerin 的博客')}</span>
+            </span>
+            <span className="mj-foot-cta-arrow">→</span>
+          </a>
+        </footer>
+
+        <ToastInvite />
+
+        {tweaksOn && (
+          <div style={{
+            position: 'fixed', bottom: 20, right: 20, zIndex: 100,
+            background: 'var(--paper)', border: '1px solid var(--rule)',
+            padding: 16, borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+            fontFamily: 'var(--sans)', minWidth: 200,
+          }}>
+            <div style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: 'var(--ink-muted)', marginBottom: 10, fontWeight: 600 }}>Tweaks</div>
+            <div style={{ fontSize: 13, marginBottom: 8, color: 'var(--ink-soft)' }}>{textByLang(lang, 'Color theme', '颜色主题')}</div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTheme2(t.id)}
+                  style={{
+                    flex: 1, padding: '8px 10px', fontSize: 12, cursor: 'pointer',
+                    border: '1px solid ' + (theme === t.id ? 'var(--jade)' : 'var(--rule)'),
+                    background: theme === t.id ? 'var(--jade-wash)' : 'var(--paper)',
+                    color: 'var(--ink)', borderRadius: 5, fontFamily: 'inherit',
+                  }}
+                >{themeLabel(t, lang)}</button>
+              ))}
+            </div>
+          </div>
+        )}
+      </LanguageContext.Provider>
     </VariantContext.Provider>
   );
 }
 
 function MobileTopbar({ active, go }) {
+  const lang = React.useContext(LanguageContext);
   const [open, setOpen] = React.useState(false);
   const activeSection = SECTIONS.find((s) => s.id === active) || SECTIONS[0];
 
@@ -1975,12 +2298,12 @@ function MobileTopbar({ active, go }) {
         <button
           className="mj-menu-btn"
           aria-expanded={open}
-          aria-label="Toggle menu"
+          aria-label={textByLang(lang, 'Toggle menu', '打开菜单')}
           onClick={() => setOpen((o) => !o)}
         >
           <span className="mj-menu-btn-label">
             <span className="mj-menu-btn-num">{activeSection.num}</span>
-            {activeSection.label}
+            {sectionLabel(activeSection, lang)}
           </span>
           <span className={`mj-menu-btn-icon ${open ? 'is-open' : ''}`}>
             <span></span><span></span><span></span>
@@ -1997,7 +2320,7 @@ function MobileTopbar({ active, go }) {
               onClick={(e) => { e.preventDefault(); go(s.id); setOpen(false); }}
             >
               <span className="mj-nav-num">{s.num}</span>
-              {s.label}
+              {sectionLabel(s, lang)}
             </a>
           ))}
         </nav>
@@ -2127,6 +2450,7 @@ function AsciiArt() {
 }
 
 function ToastInvite() {
+  const lang = React.useContext(LanguageContext);
   const [visible, setVisible] = React.useState(() => {
     try { return !localStorage.getItem('mj-invite-dismissed'); } catch { return true; }
   });
@@ -2148,17 +2472,17 @@ function ToastInvite() {
           <img src="tiles/modal-tile.svg" alt="" />
         </span>
         <span className="mj-foot-cta-text">
-          <span className="mj-foot-cta-kicker">You're invited</span>
-          <span className="mj-foot-cta-title">Visit Haerin's Blog</span>
+          <span className="mj-foot-cta-kicker">{textByLang(lang, "You're invited", '欢迎访问')}</span>
+          <span className="mj-foot-cta-title">{textByLang(lang, "Visit Haerin's Blog", '访问 Haerin 的博客')}</span>
         </span>
         <span className="mj-foot-cta-arrow">→</span>
       </a>
-      <button className="mj-toast-invite-close" onClick={dismiss} aria-label="Dismiss">×</button>
+      <button className="mj-toast-invite-close" onClick={dismiss} aria-label={textByLang(lang, 'Dismiss', '关闭')}>×</button>
     </div>
   );
 }
 
-function Hero({ theme, setTheme2, setVariant }) {
+function Hero({ theme, setTheme2, setVariant, lang, setLang }) {
   const variant = React.useContext(VariantContext);
   const [rulesetOpen, setRulesetOpen] = React.useState(false);
   const [themeOpen, setThemeOpen] = React.useState(false);
@@ -2174,12 +2498,6 @@ function Hero({ theme, setTheme2, setVariant }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const THEMES = [
-    { id: 'jade', label: 'Jade', swatch: '#006C00' },
-    { id: 'lacquer', label: 'Lacquer', swatch: '#0c1a0e' },
-    { id: 'study', label: 'Study', swatch: '#d89b2a' },
-  ];
-
   const currentRuleset = RULESETS.find(r => r.id === variant);
 
   return (
@@ -2188,7 +2506,7 @@ function Hero({ theme, setTheme2, setVariant }) {
         <div className="mj-hero-kicker">
           {/* Desktop: static label */}
           <span className="mj-kicker-static">
-            {currentRuleset.label}
+            {rulesetLabel(currentRuleset, lang)}
           </span>
           {/* Mobile: interactive row */}
           <div className="mj-kicker-interactive">
@@ -2197,7 +2515,7 @@ function Hero({ theme, setTheme2, setVariant }) {
                 className="mj-kicker-ruleset-btn"
                 onClick={() => { setRulesetOpen(!rulesetOpen); setThemeOpen(false); }}
               >
-                {currentRuleset.label}
+                {rulesetLabel(currentRuleset, lang)}
                 <svg className="mj-kicker-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none">
                   <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -2209,7 +2527,7 @@ function Hero({ theme, setTheme2, setVariant }) {
                       key={r.id}
                       className={`mj-kicker-drop-item ${variant === r.id ? 'is-active' : ''}`}
                       onClick={() => { setVariant(r.id); setRulesetOpen(false); }}
-                    >{r.label}</button>
+                    >{rulesetLabel(r, lang)}</button>
                   ))}
                 </div>
               )}
@@ -2218,7 +2536,7 @@ function Hero({ theme, setTheme2, setVariant }) {
               <button
                 className="mj-kicker-theme-btn"
                 onClick={() => { setThemeOpen(!themeOpen); setRulesetOpen(false); }}
-                aria-label="Color theme"
+                aria-label={textByLang(lang, 'Color theme', '颜色主题')}
               >
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                   <circle cx="7.5" cy="7.5" r="2.5" fill="currentColor" stroke="none"/>
@@ -2241,20 +2559,56 @@ function Hero({ theme, setTheme2, setVariant }) {
                       onClick={() => { setTheme2(t.id); setThemeOpen(false); }}
                     >
                       <span className="mj-kicker-swatch" style={{background: t.swatch}} />
-                      {t.label}
+                      {themeLabel(t, lang)}
                     </button>
                   ))}
                 </div>
               )}
             </div>
+            <div className="mj-kicker-lang-wrap">
+              <button
+                className="mj-kicker-lang-btn"
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                aria-label={textByLang(lang, 'Switch language', '切换语言')}
+              >
+                {lang === 'zh' ? 'EN' : '中文'}
+              </button>
+            </div>
           </div>
         </div>
-        <h1>
-          Learn <em>mahjong</em><br/>
-          A visual <em>guide</em><span className="mj-zh">麻將</span>
-        </h1>
+        {lang === 'zh' ? (
+          <h1>
+            学会 <em>麻将</em><br/>
+            一份可视化<em>指南</em><span className="mj-zh">麻將</span>
+          </h1>
+        ) : (
+          <h1>
+            Learn <em>mahjong</em><br/>
+            A visual <em>guide</em><span className="mj-zh">麻將</span>
+          </h1>
+        )}
         <div className="mj-hero-meta">
-          {variant === 'taiwan' ? (
+          {lang === 'zh' ? (
+            variant === 'taiwan' ? (
+              <>
+                <div><strong>144</strong>张牌一副</div>
+                <div><strong>16</strong>张起手，17 张胡</div>
+                <div><strong>5</strong>组面子 + 1 对将</div>
+              </>
+            ) : variant === 'sichuan' ? (
+              <>
+                <div><strong>108</strong>只用三门花色</div>
+                <div><strong>13</strong>张起手，14 张胡</div>
+                <div><strong>缺</strong>一门才能胡</div>
+              </>
+            ) : (
+              <>
+                <div><strong>136</strong>张牌一副</div>
+                <div><strong>13</strong>张起手，14 张胡</div>
+                <div><strong>4</strong>组面子 + 1 对将</div>
+              </>
+            )
+          ) : variant === 'taiwan' ? (
             <>
               <div><strong>144</strong>tiles in a set</div>
               <div><strong>16</strong>tiles dealt, 17 to win</div>
@@ -2281,7 +2635,7 @@ function Hero({ theme, setTheme2, setVariant }) {
       </div>
 
       <div className="mj-hero-signature">
-        inspired by emily <span className="mj-hero-signature-heart">💚</span>
+        {textByLang(lang, 'inspired by emily', '灵感来自 emily')} <span className="mj-hero-signature-heart">💚</span>
       </div>
     </section>
   );
